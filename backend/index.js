@@ -26,7 +26,7 @@ app.get("/:collection", async (req, res) => {
     const collection = req.params.collection;
     await client.connect();
 
-    const query = { };
+    const query = {};
     const results = await db
         .collection(collection)
         .find(query)
@@ -41,7 +41,7 @@ app.get("/:collection/:infotype", async (req, res) => {
     const collection = req.params.collection;
     await client.connect();
 
-    const query = {"type": infotype};
+    const query = { "type": infotype };
     const results = await db
         .collection(collection)
         .find(query)
@@ -58,10 +58,9 @@ app.get("/:collection/:infotype/:id", async (req, res) => {
     await client.connect();
 
     const query = {
-        "id": id, 
+        "id": id,
         "type": infotype
     };
-    console.log(query)
     const results = await db
         .collection(collection)
         .find(query)
@@ -71,7 +70,7 @@ app.get("/:collection/:infotype/:id", async (req, res) => {
     res.send(results);
 });
 
-app.post("/addProduct", async (req, res) => {
+app.post("/:collection/:infotype/:id/addReview", async (req, res) => {
 
     try {
         await client.connect();
