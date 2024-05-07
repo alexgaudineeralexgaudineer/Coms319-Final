@@ -22,47 +22,17 @@ app.listen(port, () => {
     console.log("App listening at http://%s:%s", host, port);
 });
 
-app.get("/:collection", async (req, res) => {
-    const collection = req.params.collection;
-    await client.connect();
-
-    const query = {};
-    const results = await db
-        .collection(collection)
-        .find(query)
-        .limit(100)
-        .toArray();
-    res.status(200);
-    res.send(results);
-});
-
-app.get("/:collection/:infotype", async (req, res) => {
+app.get("/:animal/:infotype", async (req, res) => {
     const infotype = req.params.infotype;
-    const collection = req.params.collection;
-    await client.connect();
-
-    const query = { "type": infotype };
-    const results = await db
-        .collection(collection)
-        .find(query)
-        .limit(100)
-        .toArray();
-    res.status(200);
-    res.send(results);
-});
-
-app.get("/:collection/:infotype/:id", async (req, res) => {
-    const id = Number(req.params.id);
-    const infotype = req.params.infotype;
-    const collection = req.params.collection;
+    const animal = req.params.animal;
     await client.connect();
 
     const query = {
-        "id": id,
+        "animal": animal,
         "type": infotype
     };
     const results = await db
-        .collection(collection)
+        .collection("products")
         .find(query)
         .limit(100)
         .toArray();
@@ -70,90 +40,115 @@ app.get("/:collection/:infotype/:id", async (req, res) => {
     res.send(results);
 });
 
-app.post("/:collection/:infotype/:id/addReview", async (req, res) => {
+app.get("/:id", async (req, res) => {
+    const id = Number(req.params.id);
+    await client.connect();
 
+    const query = {
+        "id": id
+    };
+    const results = await db
+        .collection("products")
+        .find(query)
+        .limit(100)
+        .toArray();
+    res.status(200);
+    res.send(results);
+});
+
+app.get("/:id/getReviews", async (req, res) => {
+    const id = Number(req.params.id);
+    await client.connect();
+
+    const query = {
+        "productId": id
+    };
+    const results = await db
+        .collection("reviews")
+        .find(query)
+        .limit(100)
+        .toArray();
+    res.status(200);
+    res.send(results);
+});
+
+app.post("/:id/addReview", async (req, res) => {
     try {
         await client.connect();
 
-        const newProduct = {
-            "id": Number(req.body.id),
-            "title": req.body.title,
-            "price": Number(req.body.price),
-            "description": req.body.description,
-            "category": req.body.category,
-            "image": req.body.image,
-            "rating":
-            {
-                "rate": Number(req.body.rating.rate),
-                "count": req.body.rating.count
-            }
+        const newReview = {
+            "productId": Number(req.body.id),
+            "name": req.body.name,
+            "text": req.body.text,
+            "rating": Number(req.body.rating)
         };
 
         const results = await db
-            .collection("fakestore_catalog")
-            .insertOne(newProduct);
+            .collection("reviews")
+            .insertOne(newReview);
 
         res.status(200);
         res.send(results);
     } catch (error) {
-        console.error("Error adding product:", error);
+        console.error("Error adding review:", error);
         res.status(500).send({ message: 'Internal Server Error' });
     }
 });
 
-app.delete("/deleteProduct/:id", async (req, res) => {
+app.delete("/:id/deleteReview/:name", async (req, res) => {
     try {
+        const name = req.params.name;
         const id = Number(req.params.id);
         await client.connect();
 
-        const query = { id: id };
+        const query = {
+            "productId": id,
+            "name": name
+        };
 
-        const productDeleted = await db.collection("fakestore_catalog").findOne(query);
-        const results = await db.collection("fakestore_catalog").deleteOne(query);
+        const reviewDeleted = await db.collection("reviews").findOne(query);
+        const results = await db.collection("reviews").deleteOne(query);
 
         res.status(200);
-        res.send(productDeleted);
+        res.send(reviewDeleted);
     }
     catch (error) {
-        console.error("Error deleting product:", error);
+        console.error("Error deleting review:", error);
         res.status(500).send({ message: 'Internal Server Error' });
     }
 });
 
-app.put("/updateProduct/:id", async (req, res) => {
+app.put("/:id/updateReview/:name", async (req, res) => {
     try {
-
         const id = Number(req.params.id);
-        const query = { id: id };
+        const name = req.params.name;
+        const query = {
+            "id": id,
+            "name": name
+        };
 
         await client.connect();
 
         const updateData = {
             $set: {
-                "title": req.body.title,
-                "price": req.body.price,
-                "description": req.body.description,
-                "category": req.body.category,
-                "image": req.body.image,
-                "rating":
-                {
-                    "rate": req.body.rating.rate,
-                    "count": req.body.rating.count
-                }
+                "productId": Number(req.body.id),
+                "name": req.body.name,
+                "text": req.body.text,
+                "rating": Number(req.body.rating)
             }
         };
 
-        const productUpdated = await db.collection("fakestore_catalog").findOne(query);
-        const results = await db.collection("fakestore_catalog").updateOne(query, updateData, {});
+        const reviewUpdated = await db.collection("reviews").findOne(query);
+        const results = await db.collection("reviews").updateOne(query, updateData, {});
 
         if (results.matchedCount === 0) {
-            return res.status(404).send({ message: 'Product not found' });
+            return res.status(404).send({ message: 'Review not found' });
         }
 
         res.status(200);
-        res.send(productUpdated);
+        res.send(reviewUpdated);
     } catch (error) {
-        console.error("Error updating product:", error);
+        console.error("Error updating review:", error);
         res.status(500).send({ message: 'Internal Server Error' });
     }
 });
