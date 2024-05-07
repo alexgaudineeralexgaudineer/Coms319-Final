@@ -20,7 +20,9 @@ function App() {
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   const CatView = () => {
-    const [products, setProducts] = useState([]);
+    const [food, setFood] = useState([]);
+    const [vets, setVets] = useState([]);
+    const [toys, setToys] = useState([]);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [newReview, setNewReview] = useState({
       productId: "",
@@ -31,15 +33,34 @@ function App() {
 
     // Fetch cat-related products on component mount
     useEffect(() => {
-      const fetchProducts = async () => {
+      const fetchFood = async () => {
         try {
-          const response = await axios.get("http://localhost:8081/cat/product");
-          setProducts(response.data);
+          const response = await axios.get("http://localhost:8081/cats/food");
+          setFood(response.data);
         } catch (error) {
-          console.error("Error fetching products:", error);
+          console.error("Error fetching food:", error);
         }
       };
-      fetchProducts();
+      const fetchVets = async () => {
+        try {
+          const response = await axios.get("http://localhost:8081/cats/vet");
+          setVets(response.data);
+        } catch (error) {
+          console.error("Error fetching vets:", error);
+        }
+      };
+      const fetchToys = async () => {
+        try {
+          const response = await axios.get("http://localhost:8081/cats/toy");
+          setToys(response.data);
+        } catch (error) {
+          console.error("Error fetching toys:", error);
+        }
+      };
+
+      fetchFood();
+      fetchToys()
+      fetchVets();
     }, []);
 
     // Fetch reviews for the selected product
@@ -57,11 +78,12 @@ function App() {
     // Display list of products and handle review actions
     return (
         <div className="container">
-          <h1>Cat Products</h1>
-          {products.length > 0 ? (
-              products.map((product) => (
+          <h1>Cat Food</h1>
+          {food.length > 0 ? (
+              food.map((product) => (
                   <div key={product.id}>
-                    <h3>{product.name}</h3>
+                    <h3>{product.title}</h3>
+                    <img src={product.image} />
                     <button
                         className="btn btn-info"
                         onClick={() => {
