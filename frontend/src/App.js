@@ -253,9 +253,104 @@ function App() {
   };
 
   const ProductDetailView = ({ product, changeView }) => {
-    if (!product) {
-      return <div>No product selected.</div>;
-    }
+    const [reviews, setReviews] = useState([]);
+
+    useEffect(() => {
+      // Fetch reviews for the given product
+      const fetchReviews = async () => {
+        if (!product || !product.id) return;
+        try {
+          const response = await axios.get(`http://nirajamin.com:8081/product/${product.id}/getReviews`);
+          setReviews(response.data);
+        } catch (error) {
+          console.error("Error fetching reviews:", error);
+        }
+      };
+
+      fetchReviews();
+    }, [product]);
+
+    const handleAddReview = async (reviewData) => {
+      try {
+        await axios.post(
+            `http://nirajamin.com:8081/product/${product.id}/addReview`,
+            reviewData
+        );
+        setReviews([...reviews, reviewData]); // Add to the current state
+      } catch (error) {
+        console.error("Error adding review:", error);
+      }
+    };
+
+    const handleUpdateReview = async (reviewName, newText) => {
+      try {
+        await axios.put(
+            `http://nirajamin.com:8081/product/${product.id}/updateReview/${reviewName}`,
+            { text: newText }
+        );
+        const updatedReviews = reviews.map((review) =>
+            review.name === reviewName ? { ...review, text: newText } : review
+        );
+        setReviews(updatedReviews); // Update state with new review text
+      } catch (error) {
+        console.error("Error updating review:", error);
+      }
+    };
+
+    const handleDeleteReview = async (reviewName) => {
+      try {
+        await axios.delete(
+            `http://nirajamin.com:8081/product/${product.id}/deleteReview/${reviewName}`
+        );
+        const remainingReviews = reviews.filter((review) => review.name !== reviewName);
+        setReviews(remainingReviews); // Remove deleted review from state
+      } catch (error) {
+        console.error("Error deleting review:", error);
+      }
+    };
+
+    const ReviewForm = ({ onSubmit }) => {
+      const [reviewName, setReviewName] = useState('');
+      const [reviewText, setReviewText] = useState('');
+      const [reviewRating, setReviewRating] = useState(1);
+
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        onSubmit({
+          name: reviewName,
+          text: reviewText,
+          rating: reviewRating,
+        });
+        // Reset the form
+        setReviewName('');
+        setReviewText('');
+        setReviewRating(1);
+      };
+
+      return (
+          <form onSubmit={handleSubmit}>
+            <input
+                type="text"
+                placeholder="Your name"
+                value={reviewName}
+                onChange={(e) => setReviewName(e.target.value)}
+            />
+            <input
+                type="text"
+                placeholder="Your review"
+                value={reviewText}
+                onChange={(e) => setReviewText(e.target.value)}
+            />
+            <input
+                type="number"
+                placeholder="Rating"
+                value={reviewRating}
+                onChange={(e) => setReviewRating(Number(e.target.value))}
+            />
+            <button type="submit">Add Review</button>
+          </form>
+      );
+    };
 
     return (
         <div>
@@ -264,9 +359,23 @@ function App() {
           <img src={product.image} alt={product.name} style={{ height: '400px', objectFit: 'cover' }} />
           <p>{product.description}</p>
           <p><strong>Price:</strong> ${product.price}</p>
+
+          <h2>Reviews</h2>
+          {reviews.map((review) => (
+              <div key={review.name}>
+                <strong>{review.name}</strong>: {review.text}
+                <button onClick={() => handleUpdateReview(review.name, prompt("Update review text", review.text))}>
+                  Edit Review
+                </button>
+                <button onClick={() => handleDeleteReview(review.name)}>Delete Review</button>
+              </div>
+          ))}
+
+          <ReviewForm onSubmit={handleAddReview} />
         </div>
     );
   };
+
 
   const CatView = ({ onProductClick }) => {
     const [products, setProducts] = useState({ food: [], toy: [], vet: [] });
@@ -341,7 +450,7 @@ function App() {
         </div>
     );
   };
-  
+
   const CheckoutView = () => {
     const { register, handleSubmit, formState: { errors } } = useForm();
 
