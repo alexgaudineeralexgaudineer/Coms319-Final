@@ -15,6 +15,18 @@ function App() {
   const [cart, setCart] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
 
+  const StarRating = ({ rating }) => {
+    const fullStar = '★'; // Character for a filled star
+    const emptyStar = '☆'; // Character for an empty star
+
+    // Create an array of star symbols based on the given rating
+    const stars = Array.from({ length: 5 }, (_, index) =>
+        index < rating ? fullStar : emptyStar
+    );
+
+    // Join the array of stars into a single string for display
+    return <span>{stars.join(' ')}</span>;
+  };
 
   const addToCart = (el) => {
     console.log(el)
@@ -107,20 +119,25 @@ function App() {
         <div className="row">
           {products.map((product) => (
               <div key={product.id} className="col-md-4">
-                <div className="card mb-3" onClick={() => onProductClick(product)}>
-                  <img
-                      src={product.image}
-                      alt={product.name}
-                      className="card-img-top"
-                      style={{ height: '200px', objectFit: 'cover' }}
-                  />
+                <div className="card mb-3">
+                  <div
+                      onClick={() => onProductClick(product)} // Navigate to product view
+                      style={{cursor: 'pointer'}} // Cursor changes to pointer on hover
+                  >
+                    <img
+                        src={product.image}
+                        alt={product.name}
+                        className="card-img-top"
+                        style={{height: '200px', objectFit: 'cover'}}
+                    />
+                  </div>
                   <div className="card-body">
                     <h3>{product.name}</h3>
                     <p>{product.description}</p>
                     <p><strong>Price:</strong> ${product.price}</p>
-                  <button type="button" variant="light" onClick={() => removeFromCart(product)} > - </button>
-                  {"  " + howMany(product) + " "}
-                  <button type="button" variant="light" onClick={() => addToCart(product)}> + </button>
+                    <button type="button" variant="light" onClick={() => removeFromCart(product)}> -</button>
+                    {"  " + howMany(product) + " "}
+                    <button type="button" variant="light" onClick={() => addToCart(product)}> +</button>
                   </div>
                 </div>
               </div>
@@ -138,7 +155,7 @@ function App() {
 
   function StudentView() {
     const teacherImageAlpaca =
-      "https://www.cs.iastate.edu/files/styles/people_thumb/public/people/profilepictures/1517665937421.jpg?itok=15jJS_fr";
+        "https://www.cs.iastate.edu/files/styles/people_thumb/public/people/profilepictures/1517665937421.jpg?itok=15jJS_fr";
 
     return (
       <div className="student-view p-5" style={{ backgroundColor: "#2F4F4F" }}>
@@ -315,49 +332,65 @@ function App() {
 
   const ProductDetailView = ({ product, changeView }) => {
     const [reviews, setReviews] = useState([]);
+    const [reviewName, setReviewName] = useState('');
+    const [reviewText, setReviewText] = useState('');
+    const [reviewRating, setReviewRating] = useState(1);
 
     useEffect(() => {
-      // Fetch reviews for the given product
       const fetchReviews = async () => {
         if (!product || !product.id) return;
         try {
           const response = await axios.get(`http://nirajamin.com:8081/product/${product.id}/getReviews`);
-          setReviews(response.data);
+          setReviews(response.data); // Set reviews in state
         } catch (error) {
           console.error("Error fetching reviews:", error);
         }
       };
 
-      fetchReviews();
+      fetchReviews(); // Fetch reviews on component mount
     }, [product]);
 
-    const handleAddReview = async (reviewData) => {
+    const refreshReviews = async () => {
       try {
+        const response = await axios.get(`http://nirajamin.com:8081/product/${product.id}/getReviews`);
+        setReviews(response.data); // Refresh state with updated reviews
+      } catch (error) {
+        console.error("Error refreshing reviews:", error);
+      }
+    };
+
+    const handleAddReview = async () => {
+      try {
+        const newReview = {
+          productid: product.id,
+          name: reviewName,
+          text: reviewText,
+          rating: reviewRating,
+        };
+
         await axios.post(
             `http://nirajamin.com:8081/product/${product.id}/addReview`,
-            reviewData
+            newReview
         );
-        setReviews([...reviews, reviewData]); // Add to the current state
+
+        refreshReviews(); // Fetch updated reviews to reflect changes
       } catch (error) {
         console.error("Error adding review:", error);
       }
     };
 
-    const handleUpdateReview = async (reviewName, newText) => {
+    const handleUpdateReview = async (reviewName, newText, newRating) => {
       try {
         await axios.put(
             `http://nirajamin.com:8081/product/${product.id}/updateReview/${reviewName}`,
-            { text: newText }
+            { text: newText, rating: newRating }
         );
-        const updatedReviews = reviews.map((review) =>
-            review.name === reviewName ? { ...review, text: newText } : review
-        );
-        setReviews(updatedReviews); // Update state with new review text
+
+        refreshReviews(); // Fetch updated reviews to reflect changes
       } catch (error) {
         console.error("Error updating review:", error);
       }
     };
-
     const handleDeleteReview = async (reviewName) => {
       try {
         await axios.delete(
@@ -370,26 +403,36 @@ function App() {
       }
     };
 
-    const ReviewForm = ({ onSubmit }) => {
-      const [reviewName, setReviewName] = useState('');
-      const [reviewText, setReviewText] = useState('');
-      const [reviewRating, setReviewRating] = useState(1);
 
-      const handleSubmit = (e) => {
-        e.preventDefault();
-        onSubmit({
-          name: reviewName,
-          text: reviewText,
-          rating: reviewRating,
-        });
-        // Reset the form
-        setReviewName('');
-        setReviewText('');
-        setReviewRating(1);
-      };
+    return (
+        <div>
+          <button onClick={() => changeView(2)}>Back to Cat Products</button>
+          <h1>{product.name}</h1>
+          <img src={product.image} alt={product.name} style={{ height: '400px', objectFit: 'cover' }} />
+          <p>{product.description}</p>
+          <p><strong>Price:</strong> ${product.price}</p>
 
-      return (
-          <form onSubmit={handleSubmit}>
+          <h2>Reviews</h2>
+          {reviews.map((review) => (
+              <div key={review.name}>
+                <strong>{review.name}</strong>: {review.text} - <StarRating rating={review.rating} />
+                <button
+                    onClick={() => {
+                      const newText = prompt("Update review text", review.text);
+                      const newRating = parseInt(prompt("Update rating (1-5)", review.rating));
+                      if (newText && newRating >= 1 && newRating <= 5) {
+                        handleUpdateReview(review.name, newText, newRating);
+                      }
+                    }}
+                >
+                  Edit Review
+                </button>
+                <button onClick={() => handleDeleteReview(review.name)}>Delete Review</button>
+              </div>
+          ))}
+
+          <div>
+            <h3>Add a Review</h3>
             <input
                 type="text"
                 placeholder="Your name"
@@ -404,39 +447,17 @@ function App() {
             />
             <input
                 type="number"
-                placeholder="Rating"
+                placeholder="Rating (1-5)"
+                min="1"
+                max="5"
                 value={reviewRating}
                 onChange={(e) => setReviewRating(Number(e.target.value))}
             />
-            <button type="submit">Add Review</button>
-          </form>
-      );
-    };
-
-    return (
-        <div>
-          <button onClick={() => changeView(2)}>Back to Cat Products</button>
-          <h1>{product.name}</h1>
-          <img src={product.image} alt={product.name} style={{ height: '400px', objectFit: 'cover' }} />
-          <p>{product.description}</p>
-          <p><strong>Price:</strong> ${product.price}</p>
-
-          <h2>Reviews</h2>
-          {reviews.map((review) => (
-              <div key={review.name}>
-                <strong>{review.name}</strong>: {review.text}
-                <button onClick={() => handleUpdateReview(review.name, prompt("Update review text", review.text))}>
-                  Edit Review
-                </button>
-                <button onClick={() => handleDeleteReview(review.name)}>Delete Review</button>
-              </div>
-          ))}
-
-          <ReviewForm onSubmit={handleAddReview} />
+            <button onClick={handleAddReview}>Add Review</button>
+          </div>
         </div>
     );
   };
-
 
   const CatView = ({ onProductClick }) => {
     const [products, setProducts] = useState({ food: [], toy: [], vet: [] });
