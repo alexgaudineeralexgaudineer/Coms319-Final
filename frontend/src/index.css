@@ -11,3 +11,21 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.checkout-main {
+  display: flex;
+  flex-direction: row;
+}
+
+.checkout-left {
+  width: 25vw;
+}
+
+.checkout-mid {
+  width: 50vw;
+}
+
+.checkout-right {
+  margin-left: 20px;
+  width: 25vw;
+}
