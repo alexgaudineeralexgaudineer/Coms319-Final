@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useForm } from "react-hook-form";
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, redirectDocument } from 'react-router-dom';
 import axios from 'axios'; // For HTTP requests
 import "./App.css";
 //import "bootstrap/dist/css/bootstrap.css";
@@ -15,28 +15,86 @@ function App() {
   const [cart, setCart] = useState([]);
 
   const addToCart = (el) => {
-    setCart([...cart, el]);
+    console.log(el)
+    let hardCopy = [...cart];
+    let elFound = false
+
+    hardCopy.map((cartEl) => {
+      if (cartEl.id == el.id){
+        cartEl.quantity += 1;
+        setCart(hardCopy)
+        elFound = true
+      }
+    })
+
+    if (!elFound){
+      el.quantity = 1;
+      setCart([...cart, el]);
+    }
   };
 
   const removeFromCart = (el) => {
     let hardCopy = [...cart];
-    hardCopy = hardCopy.filter((cartItem) => cartItem.id !== el.id);
+
+    hardCopy.map((cartEl) => {
+      if (cartEl.id == el.id){
+        cartEl.quantity -= 1;
+      }
+    })
+
+    hardCopy = hardCopy.filter((cartItem) => cartItem.quantity !== 0);
     setCart(hardCopy);
   };
 
+  function howMany(el) {
+    let total = 0;
+    cart.map((cartEl) => {
+      if (cartEl.id == el.id) {
+        total = cartEl.quantity
+      }
+    })
+
+    return total
+  }
+
+  function totalLength() {
+    let total = 0;
+    cart.map((cartEl) => {
+      total += cartEl.quantity
+    })
+    return total
+  }
+
   const cartItems = cart.map((el) => (
-    <div key={el.id}>
-      <img class="img-fluid" src={el.image} width={150} />
-      {el.title}
-      ${el.price}
-    </div>
+    <>
+      <div className='checkout-item' key={el.id}>
+        <div>
+          <img class="img-fluid" src={el.image} width={250} />
+        </div>
+
+        <div className='checkout-info'>
+
+          Product: <b>{el.title}</b>
+          <br />
+          Price <b>${el.price}</b>
+          <br />
+          <br />
+          <button type="button" variant="light" onClick={() => removeFromCart(el)} > - </button>
+          {"  " + howMany(el) + " "}
+          <button type="button" variant="light" onClick={() => addToCart(el)}> + </button>
+
+
+        </div>
+      </div>
+    </>
   ));
 
   function getTotal() {
     let total = 0
     cart.map((el) => {
-      total += el.price
+      total += (el.price * el.quantity)
     })
+    total = (Math.round(total * 100)) / 100
     return total
   }
 
@@ -45,35 +103,41 @@ function App() {
       products = [];
     }
     return (
-        <div>
-          <h2>{title}</h2>
-          <div className="row">
-            {products.map((product) => (
-                <div key={product.id} className="col-md-4">
-                  <div className="card mb-3">
-                    <img
-                        src={product.image} // Product image
-                        alt={product.name} // Alt text
-                        className="card-img-top"
-                        style={{ height: '200px', objectFit: 'cover' }} // Image style
-                    />
-                    <div className="card-body">
-                      <h3>{product.name}</h3>
-                      <p>{product.description}</p>
-                      <p><strong>Price:</strong> ${product.price}</p>
-                      <button
-                          className="btn btn-info"
-                          onClick={() => handleProductSelect(product)}
-                      >
-                        View Reviews
-                      </button>
-                    </div>
-                  </div>
-                  {product.showReviews && <ReviewManager productId={product.id} />}
+      <div>
+        <h2>{title}</h2>
+        <div className="row">
+          {products.map((product) => (
+            <div key={product.id} className="col-md-4">
+              <div className="card mb-3">
+                <img
+                  src={product.image} // Product image
+                  alt={product.name} // Alt text
+                  className="card-img-top"
+                  style={{ height: '200px', objectFit: 'cover' }} // Image style
+                />
+                <div className="card-body">
+                  <h3>{product.name}</h3>
+                  <p>{product.description}</p>
+                  <p><strong>Price:</strong> ${product.price}</p>
+                  <button
+                    className="btn btn-info"
+                    onClick={() => handleProductSelect(product)}
+                  >
+                    View Reviews
+                  </button>
+                  <br />
+                  <br />
+                  <button type="button" variant="light" onClick={() => removeFromCart(product)} > - </button>
+                  {"  " + howMany(product) + " "}
+                  <button type="button" variant="light" onClick={() => addToCart(product)}> + </button>
+
                 </div>
-            ))}
-          </div>
+              </div>
+              {product.showReviews && <ReviewManager productId={product.id} />}
+            </div>
+          ))}
         </div>
+      </div>
     );
   };
 
@@ -292,10 +356,10 @@ function App() {
       setProducts((prevProducts) => {
         const newProducts = { ...prevProducts };
         const category = Object.keys(newProducts).find((cat) =>
-            newProducts[cat].some((p) => p.id === product.id)
+          newProducts[cat].some((p) => p.id === product.id)
         );
         newProducts[category] = newProducts[category].map((p) =>
-            p.id === product.id ? { ...p, showReviews: !p.showReviews } : p
+          p.id === product.id ? { ...p, showReviews: !p.showReviews } : p
         );
         return newProducts;
       });
@@ -303,12 +367,12 @@ function App() {
 
 
     return (
-        <div>
-          <h1>Cat Products</h1>
-          <ProductRow title="Food" products={products.food} handleProductSelect={handleProductSelect} />
-          <ProductRow title="Toys" products={products.toy} handleProductSelect={handleProductSelect} />
-          <ProductRow title="Vets" products={products.vet} handleProductSelect={handleProductSelect} />
-        </div>
+      <div>
+        <h1>Cat Products</h1>
+        <ProductRow title="Food" products={products.food} handleProductSelect={handleProductSelect} />
+        <ProductRow title="Toys" products={products.toy} handleProductSelect={handleProductSelect} />
+        <ProductRow title="Vets" products={products.vet} handleProductSelect={handleProductSelect} />
+      </div>
     );
   };
 
@@ -343,10 +407,10 @@ function App() {
       setProducts((prevProducts) => {
         const newProducts = { ...prevProducts };
         const category = Object.keys(newProducts).find((cat) =>
-            newProducts[cat].some((p) => p.id === product.id)
+          newProducts[cat].some((p) => p.id === product.id)
         );
         newProducts[category] = newProducts[category].map((p) =>
-            p.id === product.id ? { ...p, showReviews: !p.showReviews } : p
+          p.id === product.id ? { ...p, showReviews: !p.showReviews } : p
         );
         return newProducts;
       });
@@ -354,12 +418,12 @@ function App() {
 
 
     return (
-        <div>
-          <h1>Dog Products</h1>
-          <ProductRow title="Food" products={products.food} handleProductSelect={handleProductSelect} />
-          <ProductRow title="Toys" products={products.toy} handleProductSelect={handleProductSelect} />
-          <ProductRow title="Vets" products={products.vet} handleProductSelect={handleProductSelect} />
-        </div>
+      <div>
+        <h1>Dog Products</h1>
+        <ProductRow title="Food" products={products.food} handleProductSelect={handleProductSelect} />
+        <ProductRow title="Toys" products={products.toy} handleProductSelect={handleProductSelect} />
+        <ProductRow title="Vets" products={products.vet} handleProductSelect={handleProductSelect} />
+      </div>
     );
   };
 
@@ -379,7 +443,6 @@ function App() {
         <div className='checkout-left'>
           <br />
           <br />
-          Shopping cart
           {cartItems}
         </div>
         <div className='checkout-mid'>
@@ -421,11 +484,11 @@ function App() {
         <div className='checkout-right'>
           <br />
           <br />
-          Subtotal: {getTotal()}
+          Subtotal: <b>${getTotal()}</b>
           <br />
-          Tax and Shipping: {getTotal() * 0.07}
+          Tax and Shipping: <b>${Math.round(getTotal() * 7) / 100}</b>
           <br />
-          Total: {getTotal() + (getTotal() * 0.07)}
+          Total: <b>${Math.round(getTotal() * 100 + (getTotal() * 7)) / 100}</b>
 
         </div>
       </div>
@@ -437,7 +500,7 @@ function App() {
     const updateHooks = () => {
       changeView(1);
       setCheckoutData({});
-  };
+    };
 
     return (<div>
       <h1>Payment summary:</h1>
@@ -487,7 +550,7 @@ function App() {
               id="navitem-4"
               onClick={() => changeView(4)}
             >
-              Checkout ({cart.length})
+              Checkout ({totalLength()})
             </p>
           </li>
         </ul>

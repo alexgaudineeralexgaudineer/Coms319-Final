@@ -18,7 +18,7 @@ code {
 }
 
 .checkout-left {
-  width: 25vw;
+  width: 35vw;
 }
 
 .checkout-mid {
@@ -27,5 +27,21 @@ code {
 
 .checkout-right {
   margin-left: 20px;
-  width: 25vw;
+  width: 15vw;
+}
+
+.checkout-item {
+  padding: 7px;
+  margin-bottom: 6px;
+  border-radius: 5px;
+  background-color: lightgrey;
+  display: flex;
+  flex-direction: row;
+  width: 35vw;
+}
+
+
+.checkout-info {
+  padding-left: 15px;
+  width: 10vw; 
 }
