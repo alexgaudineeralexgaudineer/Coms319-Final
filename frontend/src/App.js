@@ -13,6 +13,32 @@ function App() {
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  const ProductRow = ({ title, products, handleProductSelect }) => {
+    // Ensure products is always an array to avoid runtime errors
+    if (!Array.isArray(products)) {
+      products = [];
+    }
+    return (
+        <div>
+          <h2>{title}</h2>
+          <div className="row">
+            {products.map((product) => (
+                <div key={product.id} className="col-md-4">
+                  <div className="card mb-3">
+                    <div className="card-body">
+                      <h3>{product.name}</h3>
+                      <button className="btn btn-info" onClick={() => handleProductSelect(product)}>View Reviews</button>
+                    </div>
+                  </div>
+                  {product.showReviews && <ReviewManager productId={product.id} />}
+                </div>
+            ))}
+          </div>
+        </div>
+    );
+  };
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   function changeView(viewNumber) {
     const currentNavItem = "navitem-" + viewer;
     document.getElementById(currentNavItem).classList.remove("active");
@@ -98,7 +124,7 @@ const AnimalInfo = ({ animal, infotype }) => {
   useEffect(() => {
     const fetchInfo = async () => {
       try {
-        const response = await axios.get(`http://localhost:8081/${animal}/${infotype}`);
+        const response = await axios.get(`http://nirajamin.com:8081/${animal}/${infotype}`);
         const data = response.data.length ? response.data[0].description : 'No information available';
         setInfo(data);
       } catch (error) {
@@ -124,7 +150,7 @@ const Review = ({ productId, review, refreshReviews }) => {
   const handleUpdateReview = async () => {
     try {
       await axios.put(
-          `http://localhost:8081/${productId}/updateReview/${review.name}`,
+          `http://nirajamin.com:8081/${productId}/updateReview/${review.name}`,
           { text: reviewText }
       );
       refreshReviews(); // Refresh after update
@@ -136,7 +162,7 @@ const Review = ({ productId, review, refreshReviews }) => {
   const handleDeleteReview = async () => {
     try {
       await axios.delete(
-          `http://localhost:8081/${productId}/deleteReview/${review.name}`
+          `http://nirajamin.com:8081/${productId}/deleteReview/${review.name}`
       );
       refreshReviews(); // Refresh after delete
     } catch (error) {
@@ -168,7 +194,7 @@ const ReviewManager = ({ productId }) => {
 
   const fetchReviews = async () => {
     try {
-      const response = await axios.get(`http://localhost:8081/${productId}/getReviews`);
+      const response = await axios.get(`http://nirajamin.com:8081/${productId}/getReviews`);
       setReviews(response.data);
     } catch (error) {
       console.error("Error fetching reviews:", error);
@@ -227,96 +253,93 @@ const ReviewManager = ({ productId }) => {
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-const CatView = () => {
-  const [products, setProducts] = useState([]);
-  const [selectedProduct, setSelectedProduct] = useState(null);
+  const CatView = () => {
+    const [products, setProducts] = useState({ food: [], toys: [], vets: [] });
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await axios.get("http://localhost:8081/cat/product");
-        setProducts(response.data);
-      } catch (error) {
-        console.error("Error fetching products:", error);
-      }
+    const handleProductSelect = (product) => {
+      setProducts((prevProducts) => {
+        const newProducts = { ...prevProducts };
+        const category = Object.keys(newProducts).find((cat) => newProducts[cat].some((p) => p.id === product.id));
+        newProducts[category] = newProducts[category].map((p) =>
+            p.id === product.id ? { ...p, showReviews: !p.showReviews } : p
+        );
+        return newProducts;
+      });
     };
-    fetchProducts();
-  }, []);
+    useEffect(() => {
+      const fetchProductsByType = async (type) => {
+        try {
+          const response = await axios.get(`http://nirajamin.com:8081/cat/${type}`);
+          return response.data;
+        } catch (error) {
+          console.error(`Error fetching cat ${type}:`, error);
+        }
+      };
 
-  const handleProductSelect = async (product) => {
-    setSelectedProduct(product);
-    const reviews = await axios.get(`http://localhost:8081/${product.id}/getReviews`);
-    product.reviews = reviews.data; // Update reviews in the product object
+      const fetchProducts = async () => {
+        const food = await fetchProductsByType("food");
+        const toys = await fetchProductsByType("toys");
+        const vets = await fetchProductsByType("vets");
+        setProducts({ food, toys, vets });
+      };
+
+      fetchProducts();
+    }, []);
+
+    return (
+        <div>
+          <h1>Cat Products</h1>
+          <ProductRow title="Food" products={products.food} handleProductSelect={handleProductSelect} />
+          <ProductRow title="Toys" products={products.toys} handleProductSelect={handleProductSelect} />
+          <ProductRow title="Vets" products={products.vets} handleProductSelect={handleProductSelect} />
+        </div>
+    );
   };
-
-  return (
-      <div>
-        <h1>Cat Products</h1>
-        {products.map((product) => (
-            <div key={product.id}>
-              <h3>{product.name}</h3>
-              <button
-                  className="btn btn-info"
-                  onClick={() => handleProductSelect(product)}
-              >
-                View Reviews
-              </button>
-              {selectedProduct && selectedProduct.id === product.id && (
-                  <div>
-                    <ReviewManager productId={product.id} />
-                  </div>
-              )}
-            </div>
-        ))}
-      </div>
-  );
-};
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-const DogView = () => {
-  const [products, setProducts] = useState([]);
-  const [selectedProduct, setSelectedProduct] = useState(null);
+  const DogView = () => {
+    const [products, setProducts] = useState({ food: [], toys: [], vets: [] });
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await axios.get("http://localhost:8081/dog/product");
-        setProducts(response.data);
-      } catch (error) {
-        console.error("Error fetching dog products:", error);
-      }
+    const handleProductSelect = (product) => {
+      setProducts((prevProducts) => {
+        const newProducts = { ...prevProducts };
+        const category = Object.keys(newProducts).find((cat) => newProducts[cat].some((p) => p.id === product.id));
+        newProducts[category] = newProducts[category].map((p) =>
+            p.id === product.id ? { ...p, showReviews: !p.showReviews } : p
+        );
+        return newProducts;
+      });
     };
-    fetchProducts();
-  }, []);
 
-  const handleProductSelect = async (product) => {
-    setSelectedProduct(product);
-    const reviews = await axios.get(`http://localhost:8081/${product.id}/getReviews`);
-    product.reviews = reviews.data;
+    useEffect(() => {
+      const fetchProductsByType = async (type) => {
+        try {
+          const response = await axios.get(`http://nirajamin.com:8081/dog/${type}`);
+          return response.data;
+        } catch (error) {
+          console.error(`Error fetching dog ${type}:`, error);
+        }
+      };
+
+      const fetchProducts = async () => {
+        const food = await fetchProductsByType("food");
+        const toys = await fetchProductsByType("toys");
+        const vets = await fetchProductsByType("vets");
+        setProducts({ food, toys, vets });
+      };
+
+      fetchProducts();
+    }, []);
+
+    return (
+        <div>
+          <h1>Dog Products</h1>
+          <ProductRow title="Food" products={products.food} handleProductSelect={handleProductSelect} />
+          <ProductRow title="Toys" products={products.toys} handleProductSelect={handleProductSelect} />
+          <ProductRow title="Vets" products={products.vets} handleProductSelect={handleProductSelect} />
+        </div>
+    );
   };
-
-  return (
-      <div>
-        <h1>Dog Products</h1>
-        {products.map((product) => (
-            <div key={product.id}>
-              <h3>{product.name}</h3>
-              <button
-                  className="btn btn-info"
-                  onClick={() => handleProductSelect(product)}
-              >
-                View Reviews
-              </button>
-              {selectedProduct && selectedProduct.id === product.id && (
-                  <div>
-                    <ReviewManager productId={product.id} />
-                  </div>
-              )}
-            </div>
-        ))}
-      </div>
-  );
-};
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   function createHeader() {
