@@ -14,7 +14,6 @@ function App() {
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   const ProductRow = ({ title, products, handleProductSelect }) => {
-    // Ensure products is always an array to avoid runtime errors
     if (!Array.isArray(products)) {
       products = [];
     }
@@ -25,12 +24,25 @@ function App() {
             {products.map((product) => (
                 <div key={product.id} className="col-md-4">
                   <div className="card mb-3">
+                    <img
+                        src={product.image} // Product image
+                        alt={product.name} // Alt text
+                        className="card-img-top"
+                        style={{ height: '200px', objectFit: 'cover' }} // Image style
+                    />
                     <div className="card-body">
                       <h3>{product.name}</h3>
-                      <button className="btn btn-info" onClick={() => handleProductSelect(product)}>View Reviews</button>
+                      <p>{product.description}</p> // Description
+                      <p><strong>Price:</strong> ${product.price}</p> // Price
+                      <button
+                          className="btn btn-info"
+                          onClick={() => handleProductSelect(product)}
+                      >
+                        View Reviews
+                      </button>
                     </div>
                   </div>
-                  {product.showReviews && <ReviewManager productId={product.id} />}
+                  {product.showReviews && <ReviewManager productId={product.id} />} // Conditional review display
                 </div>
             ))}
           </div>
@@ -256,20 +268,10 @@ const ReviewManager = ({ productId }) => {
   const CatView = () => {
     const [products, setProducts] = useState({ food: [], toys: [], vets: [] });
 
-    const handleProductSelect = (product) => {
-      setProducts((prevProducts) => {
-        const newProducts = { ...prevProducts };
-        const category = Object.keys(newProducts).find((cat) => newProducts[cat].some((p) => p.id === product.id));
-        newProducts[category] = newProducts[category].map((p) =>
-            p.id === product.id ? { ...p, showReviews: !p.showReviews } : p
-        );
-        return newProducts;
-      });
-    };
     useEffect(() => {
       const fetchProductsByType = async (type) => {
         try {
-          const response = await axios.get(`http://nirajamin.com:8081/cat/${type}`);
+          const response = await axios.get(`http://nirajamin.com:8081/listProducts/cat/${type}`);
           return response.data;
         } catch (error) {
           console.error(`Error fetching cat ${type}:`, error);
@@ -277,14 +279,27 @@ const ReviewManager = ({ productId }) => {
       };
 
       const fetchProducts = async () => {
-        const food = await fetchProductsByType("food");
-        const toys = await fetchProductsByType("toys");
-        const vets = await fetchProductsByType("vets");
+        const food = await fetchProductsByType('food');
+        const toys = await fetchProductsByType('toys');
+        const vets = await fetchProductsByType('vets');
         setProducts({ food, toys, vets });
       };
 
       fetchProducts();
     }, []);
+
+    const handleProductSelect = (product) => {
+      setProducts((prevProducts) => {
+        const newProducts = { ...prevProducts };
+        const category = Object.keys(newProducts).find((cat) =>
+            newProducts[cat].some((p) => p.id === product.id)
+        );
+        newProducts[category] = newProducts[category].map((p) =>
+            p.id === product.id ? { ...p, showReviews: !p.showReviews } : p
+        );
+        return newProducts;
+      });
+    };
 
     return (
         <div>
@@ -300,21 +315,10 @@ const ReviewManager = ({ productId }) => {
   const DogView = () => {
     const [products, setProducts] = useState({ food: [], toys: [], vets: [] });
 
-    const handleProductSelect = (product) => {
-      setProducts((prevProducts) => {
-        const newProducts = { ...prevProducts };
-        const category = Object.keys(newProducts).find((cat) => newProducts[cat].some((p) => p.id === product.id));
-        newProducts[category] = newProducts[category].map((p) =>
-            p.id === product.id ? { ...p, showReviews: !p.showReviews } : p
-        );
-        return newProducts;
-      });
-    };
-
     useEffect(() => {
       const fetchProductsByType = async (type) => {
         try {
-          const response = await axios.get(`http://nirajamin.com:8081/dog/${type}`);
+          const response = await axios.get(`http://nirajamin.com:8081/listProducts/dog/${type}`);
           return response.data;
         } catch (error) {
           console.error(`Error fetching dog ${type}:`, error);
@@ -322,14 +326,27 @@ const ReviewManager = ({ productId }) => {
       };
 
       const fetchProducts = async () => {
-        const food = await fetchProductsByType("food");
-        const toys = await fetchProductsByType("toys");
-        const vets = await fetchProductsByType("vets");
+        const food = await fetchProductsByType('food');
+        const toys = await fetchProductsByType('toys');
+        const vets = await fetchProductsByType('vets');
         setProducts({ food, toys, vets });
       };
 
       fetchProducts();
     }, []);
+
+    const handleProductSelect = (product) => {
+      setProducts((prevProducts) => {
+        const newProducts = { ...prevProducts };
+        const category = Object.keys(newProducts).find((cat) =>
+            newProducts[cat].some((p) => p.id === product.id)
+        );
+        newProducts[category] = newProducts[category].map((p) =>
+            p.id === product.id ? { ...p, showReviews: !p.showReviews } : p
+        );
+        return newProducts;
+      });
+    };
 
     return (
         <div>
