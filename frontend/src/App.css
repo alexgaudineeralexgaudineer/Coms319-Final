@@ -10,7 +10,7 @@ body {
 /* Navbar styling */
 .navbar {
   background-color: #333;
-  color: white;
+  color: #6c2121;
   padding: 10px;
   display: flex;
   justify-content: center;
@@ -40,7 +40,7 @@ body {
 /* Main content styling */
 .main-content {
   padding: 20px;
-  background-color: #f9f9f9;
+  background-color: rgba(134, 118, 118, 0.66);
 }
 
 /* Footer styling */
@@ -52,4 +52,14 @@ body {
   position: fixed;
   bottom: 0;
   width: 100%;
+}
+
+/* Example: App.css */
+.navbar-nav .nav-link {
+  color: #000; /* Default color for navbar links */
+}
+
+.navbar-nav .nav-item.active .nav-link {
+  font-weight: bold; /* Bold font for the active tab */
+  color: #007bff; /* Change color to highlight the active tab */
 }

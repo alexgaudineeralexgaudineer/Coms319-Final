@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { BrowserRouter as Router, Routes, Route, Link, redirectDocument } from 'react-router-dom';
 import axios from 'axios'; // For HTTP requests
 import "./App.css";
+import Navbar from "./navbar";
 //import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 
@@ -21,7 +22,7 @@ function App() {
 
     // Create an array of star symbols based on the given rating
     const stars = Array.from({ length: 5 }, (_, index) =>
-      index < rating ? fullStar : emptyStar
+        index < rating ? fullStar : emptyStar
     );
 
     // Join the array of stars into a single string for display
@@ -80,27 +81,27 @@ function App() {
   }
 
   const cartItems = cart.map((el) => (
-    <>
-      <div className='checkout-item' key={el.id}>
-        <div>
-          <img class="img-fluid" src={el.image} width={250} />
+      <>
+        <div className='checkout-item' key={el.id}>
+          <div>
+            <img class="img-fluid" src={el.image} width={250} />
+          </div>
+
+          <div className='checkout-info'>
+
+            Product: <b>{el.title}</b>
+            <br />
+            Price <b>${el.price}</b>
+            <br />
+            <br />
+            <button type="button" variant="light" onClick={() => removeFromCart(el)} > - </button>
+            {"  " + howMany(el) + " "}
+            <button type="button" variant="light" onClick={() => addToCart(el)}> + </button>
+
+
+          </div>
         </div>
-
-        <div className='checkout-info'>
-
-          Product: <b>{el.title}</b>
-          <br />
-          Price <b>${el.price}</b>
-          <br />
-          <br />
-          <button type="button" variant="light" onClick={() => removeFromCart(el)} > - </button>
-          {"  " + howMany(el) + " "}
-          <button type="button" variant="light" onClick={() => addToCart(el)}> + </button>
-
-
-        </div>
-      </div>
-    </>
+      </>
   ));
 
   function getTotal() {
@@ -113,37 +114,36 @@ function App() {
   }
 
   const ProductRow = ({ title, products, onProductClick }) => (
-
-    <div>
-      <h2>{title}</h2>
-      <div className="row">
-        {products.map((product) => (
-          <div key={product.id} className="col-md-4">
-            <div className="card mb-3">
-              <div
-                onClick={() => onProductClick(product)} // Navigate to product view
-                style={{ cursor: 'pointer' }} // Cursor changes to pointer on hover
-              >
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="card-img-top"
-                  style={{ height: '200px', objectFit: 'cover' }}
-                />
+      <div>
+        <h2>{title}</h2>
+        <div className="row">
+          {products.map((product) => (
+              <div key={product.id} className="col-md-4">
+                <div className="card mb-3">
+                  <div
+                      onClick={() => onProductClick(product)}
+                      style={{ width: '100%', height: '200px', cursor: 'pointer' }}
+                  >
+                    <img
+                        src={product.image}
+                        alt={product.name}
+                        style={{ objectFit: 'contain', width: '100%', height: '100%' }} // Entire image visible
+                    />
+                  </div>
+                  <div className="card-body">
+                    <h3>{product.name}</h3>
+                    <p>{product.description}</p>
+                    <p><strong>Price:</strong> ${product.price}</p>
+                    {/* Cart management */}
+                    <button type="button" onClick={() => removeFromCart(product)}> - </button>
+                    {"  " + howMany(product) + " "}
+                    <button type="button" onClick={() => addToCart(product)}> + </button>
+                  </div>
+                </div>
               </div>
-              <div className="card-body">
-                <h3>{product.name}</h3>
-                <p>{product.description}</p>
-                <p><strong>Price:</strong> ${product.price}</p>
-                <button type="button" variant="light" onClick={() => removeFromCart(product)}> -</button>
-                {"  " + howMany(product) + " "}
-                <button type="button" variant="light" onClick={() => addToCart(product)}> +</button>
-              </div>
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
-    </div>
   );
 
   const changeView = (viewNumber, product = null) => {
@@ -151,75 +151,76 @@ function App() {
     if (product) {
       setSelectedProduct(product);
     }
+    
   };
 
   function StudentView() {
     const teacherImageAlpaca =
-      "https://www.cs.iastate.edu/files/styles/people_thumb/public/people/profilepictures/1517665937421.jpg?itok=15jJS_fr";
+        "https://www.cs.iastate.edu/files/styles/people_thumb/public/people/profilepictures/1517665937421.jpg?itok=15jJS_fr";
 
     return (
-      <div className="student-view p-5" style={{ backgroundColor: "#2F4F4F" }}>
-        <div className="container-fluid py-5 bg-dark text-white rounded shadow-lg">
-          <h1 className="display-4 text-center text-info">SE/COMS 319</h1>
-          <p className="fs-4 text-center text-light">
-            SE/COMS 319 teaches website programming and creation at Iowa State University.
-          </p>
-        </div>
-
-        <div className="container-fluid p-4 rounded-lg" style={{ backgroundColor: "#778899" }}>
-          <h2 className="text-center text-warning">Professor</h2>
-          <div className="d-flex justify-content-center">
-            <div className="card bg-light text-dark p-3 rounded-lg shadow-lg" style={{ border: "2px solid #FFD700" }}>
-              <h3 className="text-center">Professor Aldaco</h3>
-              <img
-                className="rounded-circle"
-                src={teacherImageAlpaca}
-                alt="Professor Alpaca"
-                style={{ width: "120px", border: "3px solid #FFD700" }}
-              />
-            </div>
+        <div className="student-view p-5" style={{ backgroundColor: "#2F4F4F" }}>
+          <div className="container-fluid py-5 bg-dark text-white rounded shadow-lg">
+            <h1 className="display-4 text-center text-info">SE/COMS 319</h1>
+            <p className="fs-4 text-center text-light">
+              SE/COMS 319 teaches website programming and creation at Iowa State University.
+            </p>
           </div>
-        </div>
 
-        <div className="container-fluid p-4 rounded-lg mt-4 shadow-lg" style={{ backgroundColor: "#708090" }}>
-          <h2 className="text-center text-light">Students</h2>
-          <div className="row">
-            <div className="col-md-6 d-flex justify-content-center">
-              <div className="card bg-light text-dark p-3 rounded-lg shadow-lg" style={{ border: "2px solid #00FA9A" }}>
-                <h3 className="text-center">Niraj Amin</h3>
-                <p className="text-center fs-6">
-                  An extremely skilled computer scientist specializing in big data.
-                </p>
-                <p className="text-center fs-6">
-                  Email: namin@iastate.edu
-                  <br />
-                  Junior, loves cats and video games.
-                </p>
-              </div>
-            </div>
-            <div className="col-md-6 d-flex justify-content-center">
-              <div className="card bg-light text-dark p-3 rounded-lg shadow-lg" style={{ border: "2px solid #00FA9A" }}>
-                <h3 className="text-center">Alex Gaudineer</h3>
-                <p className="text-center fs-6">
-                  A software engineer who aspires to be a Project Manager post-grad.
-                </p>
-                <p className="text-center fs-6">
-                  Email: alexgaud@iastate.edu
-                  <br />
-                  Junior, loves everything about engineering.
-                </p>
+          <div className="container-fluid p-4 rounded-lg" style={{ backgroundColor: "#778899" }}>
+            <h2 className="text-center text-warning">Professor</h2>
+            <div className="d-flex justify-content-center">
+              <div className="card bg-light text-dark p-3 rounded-lg shadow-lg" style={{ border: "2px solid #FFD700" }}>
+                <h3 className="text-center">Professor Aldaco</h3>
+                <img
+                    className="rounded-circle"
+                    src={teacherImageAlpaca}
+                    alt="Professor Alpaca"
+                    style={{ width: "120px", border: "3px solid #FFD700" }}
+                />
               </div>
             </div>
           </div>
-        </div>
 
-        <div className="container-fluid bg-primary text-white p-4 rounded-lg mt-4 shadow-lg">
-          <h2 className="text-center">Date: 4/27/24</h2>
-          <p className="fs-4 text-center">
-            This project involves creating an API for a MERN stack website. It includes MongoDB, Express, React, and NodeJS.
-          </p>
+          <div className="container-fluid p-4 rounded-lg mt-4 shadow-lg" style={{ backgroundColor: "#708090" }}>
+            <h2 className="text-center text-light">Students</h2>
+            <div className="row">
+              <div className="col-md-6 d-flex justify-content-center">
+                <div className="card bg-light text-dark p-3 rounded-lg shadow-lg" style={{ border: "2px solid #00FA9A" }}>
+                  <h3 className="text-center">Niraj Amin</h3>
+                  <p className="text-center fs-6">
+                    An extremely skilled computer scientist specializing in big data.
+                  </p>
+                  <p className="text-center fs-6">
+                    Email: namin@iastate.edu
+                    <br />
+                    Junior, loves cats and video games.
+                  </p>
+                </div>
+              </div>
+              <div className="col-md-6 d-flex justify-content-center">
+                <div className="card bg-light text-dark p-3 rounded-lg shadow-lg" style={{ border: "2px solid #00FA9A" }}>
+                  <h3 className="text-center">Alex Gaudineer</h3>
+                  <p className="text-center fs-6">
+                    A software engineer who aspires to be a Project Manager post-grad.
+                  </p>
+                  <p className="text-center fs-6">
+                    Email: alexgaud@iastate.edu
+                    <br />
+                    Junior, loves everything about engineering.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="container-fluid bg-primary text-white p-4 rounded-lg mt-4 shadow-lg">
+            <h2 className="text-center">Date: 4/27/24</h2>
+            <p className="fs-4 text-center">
+              This project involves creating an API for a MERN stack website. It includes MongoDB, Express, React, and NodeJS.
+            </p>
+          </div>
         </div>
-      </div>
     );
   }
 
@@ -229,8 +230,8 @@ function App() {
     const handleUpdateReview = async () => {
       try {
         await axios.put(
-          `http://nirajamin.com:8081/product/${productId}/updateReview/${review.name}`,
-          { text: reviewText }
+            `http://nirajamin.com:8081/product/${productId}/updateReview/${review.name}`,
+            { text: reviewText }
         );
         refreshReviews(); // Refresh after update
       } catch (error) {
@@ -241,7 +242,7 @@ function App() {
     const handleDeleteReview = async () => {
       try {
         await axios.delete(
-          `http://nirajamin.com:8081/product/${productId}/deleteReview/${review.name}`
+            `http://nirajamin.com:8081/product/${productId}/deleteReview/${review.name}`
         );
         refreshReviews(); // Refresh after delete
       } catch (error) {
@@ -250,17 +251,17 @@ function App() {
     };
 
     return (
-      <div>
-        <strong>{review.name}</strong>: {review.text}
-        <br />
-        <input
-          type="text"
-          value={reviewText}
-          onChange={(e) => setReviewText(e.target.value)}
-        />
-        <button onClick={handleUpdateReview}>Update Review</button>
-        <button onClick={handleDeleteReview}>Delete Review</button>
-      </div>
+        <div>
+          <strong>{review.name}</strong>: {review.text}
+          <br />
+          <input
+              type="text"
+              value={reviewText}
+              onChange={(e) => setReviewText(e.target.value)}
+          />
+          <button onClick={handleUpdateReview}>Update Review</button>
+          <button onClick={handleDeleteReview}>Delete Review</button>
+        </div>
     );
   };
 
@@ -303,8 +304,8 @@ function App() {
         };
 
         await axios.post(
-          `http://nirajamin.com:8081/product/${product.id}/addReview`,
-          newReview
+            `http://nirajamin.com:8081/product/${product.id}/addReview`,
+            newReview
         );
 
         fetchReviews(); // Fetch updated reviews to reflect changes
@@ -316,13 +317,13 @@ function App() {
     const handleUpdateReview = async (reviewName, newText, newRating) => {
       try {
         const updatedReview =
-        {
-          text: newText,
-          rating: newRating
-        }
+            {
+              text: newText,
+              rating: newRating
+            }
         console.log(updatedReview)
         await axios.put(
-          `http://nirajamin.com:8081/product/${product.id}/updateReview/${reviewName}`, updatedReview
+            `http://nirajamin.com:8081/product/${product.id}/updateReview/${reviewName}`, updatedReview
 
         );
 
@@ -335,7 +336,7 @@ function App() {
     const handleDeleteReview = async (reviewName) => {
       try {
         await axios.delete(
-          `http://nirajamin.com:8081/product/${product.id}/deleteReview/${reviewName}`
+            `http://nirajamin.com:8081/product/${product.id}/deleteReview/${reviewName}`
         );
         const remainingReviews = reviews.filter((review) => review.name !== reviewName);
         setReviews(remainingReviews); // Remove deleted review from state
@@ -346,68 +347,75 @@ function App() {
 
 
     return (
-      <div>
-        <button onClick={() => changeView(returnView)}>{returnButtonText}</button>
-        <h1>{product.name}</h1>
-        <img src={product.image} alt={product.name} style={{ height: '400px', objectFit: 'cover' }} />
-        <p>{product.description}</p>
-        <p><strong>Price:</strong> ${product.price}</p>
-
-        <br />
-        <h2>Reviews</h2>
-        {reviews.map((review) => (
-          <div key={review.name}>
-            <br />
-            <strong>{review.name}</strong>: {review.text} - <StarRating rating={review.rating} />
-            <br />
-            <button
-              onClick={() => {
-                const newText = prompt("Update review text", review.text);
-                const newRating = parseInt(prompt("Update rating (1-5)", review.rating));
-                if (newText && newRating >= 1 && newRating <= 5) {
-                  handleUpdateReview(review.name, newText, newRating);
-                }
-              }}
-            >
-              Edit Review
-            </button> {" "}
-            <button onClick={() => handleDeleteReview(review.name)}>Delete Review</button>
-          </div>
-        ))}
-        <br />
-        <br />
         <div>
-          <h3>Add a Review</h3>
-          <input
-            type="text"
-            placeholder="Your name"
-            value={reviewName}
-            onChange={(e) => setReviewName(e.target.value)}
-          />
-          <br />
-          <input
-            type="text"
-            placeholder="Your review"
-            value={reviewText}
-            onChange={(e) => setReviewText(e.target.value)}
-          />{" "}
-          <input
-            type="number"
-            placeholder="Rating (1-5)"
-            min="1"
-            max="5"
-            value={reviewRating}
-            onChange={(e) => setReviewRating(Number(e.target.value))}
-          /> ★
-          <br />
-          <button onClick={handleAddReview}>Add Review</button>
+          <button onClick={() => changeView(returnView)}>{returnButtonText}</button>
+          <h1>{product.name}</h1>
+          <div style={{width: '100%', height: '400px'}}>
+            <img
+                src={product.image}
+                alt={product.name}
+                style={{ objectFit: 'contain', width: '100%', height: '100%' }} // Entire image visible
+            />
+          </div>
+          <p>{product.description}</p>
+          <p><strong>Price:</strong> ${product.price}</p>
+
+          <br/>
+          <h2>Reviews</h2>
+          {reviews.map((review) => (
+              <div key={review.name}>
+                <br/>
+                <strong>{review.name}</strong>: {review.text} - <StarRating rating={review.rating}/>
+                <br/>
+                <button
+                    onClick={() => {
+                      const newText = prompt("Update review text", review.text);
+                      const newRating = parseInt(prompt("Update rating (1-5)", review.rating));
+                      if (newText && newRating >= 1 && newRating <= 5) {
+                        handleUpdateReview(review.name, newText, newRating);
+                      }
+                    }}
+                >
+                  Edit Review
+                </button>
+                {" "}
+                <button onClick={() => handleDeleteReview(review.name)}>Delete Review</button>
+              </div>
+          ))}
+          <br/>
+          <br/>
+          <div>
+            <h3>Add a Review</h3>
+            <input
+                type="text"
+                placeholder="Your name"
+                value={reviewName}
+                onChange={(e) => setReviewName(e.target.value)}
+            />
+            <br/>
+            <input
+                type="text"
+                placeholder="Your review"
+                value={reviewText}
+                onChange={(e) => setReviewText(e.target.value)}
+            />{" "}
+            <input
+                type="number"
+                placeholder="Rating (1-5)"
+                min="1"
+                max="5"
+                value={reviewRating}
+                onChange={(e) => setReviewRating(Number(e.target.value))}
+            /> ★
+            <br/>
+            <button onClick={handleAddReview}>Add Review</button>
+          </div>
         </div>
-      </div>
     );
   };
 
-  const CatView = ({ onProductClick }) => {
-    const [products, setProducts] = useState({ food: [], toy: [], vet: [] });
+  const CatView = ({onProductClick}) => {
+    const [products, setProducts] = useState({food: [], toy: [], vet: []});
 
     useEffect(() => {
       const fetchProductsByType = async (type) => {
@@ -426,12 +434,12 @@ function App() {
     }, []);
 
     return (
-      <div>
-        <h1>Cat Products</h1>
-        <ProductRow title="Food" products={products.food} onProductClick={onProductClick} />
-        <ProductRow title="Toys" products={products.toy} onProductClick={onProductClick} />
-        <ProductRow title="Vets" products={products.vet} onProductClick={onProductClick} />
-      </div>
+        <div>
+          <h1>Cat Products</h1>
+          <ProductRow title="Food" products={products.food} onProductClick={onProductClick} />
+          <ProductRow title="Toys" products={products.toy} onProductClick={onProductClick} />
+          <ProductRow title="Vets" products={products.vet} onProductClick={onProductClick} />
+        </div>
     );
   };
 
@@ -465,18 +473,18 @@ function App() {
     }, []); // Empty dependency array to avoid re-fetching unnecessarily
 
     return (
-      <div>
-        <h1>Dog Products</h1>
-        {Object.values(products).some((arr) => arr.length > 0) ? (
-          <>
-            <ProductRow title="Food" products={products.food} onProductClick={onProductClick} />
-            <ProductRow title="Toys" products={products.toy} onProductClick={onProductClick} />
-            <ProductRow title="Vets" products={products.vet} onProductClick={onProductClick} />
-          </>
-        ) : (
-          <div>Loading products...</div> // Show a loading message until data is fetched
-        )}
-      </div>
+        <div>
+          <h1>Dog Products</h1>
+          {Object.values(products).some((arr) => arr.length > 0) ? (
+              <>
+                <ProductRow title="Food" products={products.food} onProductClick={onProductClick} />
+                <ProductRow title="Toys" products={products.toy} onProductClick={onProductClick} />
+                <ProductRow title="Vets" products={products.vet} onProductClick={onProductClick} />
+              </>
+          ) : (
+              <div>Loading products...</div> // Show a loading message until data is fetched
+          )}
+        </div>
     );
   };
 
@@ -492,59 +500,59 @@ function App() {
     }
 
     return (
-      <div className='checkout-main'>
-        <div className='checkout-left'>
-          <br />
-          <br />
-          {cartItems}
-        </div>
-        <div className='checkout-mid'>
-          <form onSubmit={handleSubmit(onSubmit)} className="container mt-5">
+        <div className='checkout-main'>
+          <div className='checkout-left'>
+            <br />
+            <br />
+            {cartItems}
+          </div>
+          <div className='checkout-mid'>
+            <form onSubmit={handleSubmit(onSubmit)} className="container mt-5">
 
-            <div className="form-group">
-              <input {...register("fullName", { required: true })} placeholder="Full Name" className="form-control" />
-              {errors.fullName && <p className="text-danger">Full Name is required.</p>}
-            </div>
-            <div className="form-group">
-              <input {...register("email", { required: true, pattern: /^\S+@\S+$/i })} placeholder="Email" className="form-control" />
-              {errors.email && <p className="text-danger">Email is required.</p>}
-            </div>
-            <div className="form-group">
-              <input {...register("creditCard", { required: true })} placeholder="Credit Card" className="form-control" />
-              {errors.creditCard && <p className="text-danger">Credit Card is required.</p>}
-            </div>
-            <div className="form-group">
-              <input {...register("address", { required: true })} placeholder="Address" className="form-control" />
-              {errors.address && <p className="text-danger">Address is required.</p>}
-            </div>
-            <div className="form-group">
-              <input {...register("address2")} placeholder="Address 2" />
-              <input {...register("city", { required: true })} placeholder="City" className="form-control" />
-              {errors.city && <p className="text-danger">City is required.</p>}
-            </div>
-            <div className="form-group">
-              <input {...register("state", { required: true })} placeholder="State" className="form-control" />
-              {errors.state && <p className="text-danger">State is required.</p>}
-            </div>
-            <div className="form-group">
-              <input {...register("zip", { required: true })} placeholder="Zip" className="form-control" />
-              {errors.zip && <p className="text-danger">Zip is required.</p>}
-            </div>
+              <div className="form-group">
+                <input {...register("fullName", { required: true })} placeholder="Full Name" className="form-control" />
+                {errors.fullName && <p className="text-danger">Full Name is required.</p>}
+              </div>
+              <div className="form-group">
+                <input {...register("email", { required: true, pattern: /^\S+@\S+$/i })} placeholder="Email" className="form-control" />
+                {errors.email && <p className="text-danger">Email is required.</p>}
+              </div>
+              <div className="form-group">
+                <input {...register("creditCard", { required: true })} placeholder="Credit Card" className="form-control" />
+                {errors.creditCard && <p className="text-danger">Credit Card is required.</p>}
+              </div>
+              <div className="form-group">
+                <input {...register("address", { required: true })} placeholder="Address" className="form-control" />
+                {errors.address && <p className="text-danger">Address is required.</p>}
+              </div>
+              <div className="form-group">
+                <input {...register("address2")} placeholder="Address 2" />
+                <input {...register("city", { required: true })} placeholder="City" className="form-control" />
+                {errors.city && <p className="text-danger">City is required.</p>}
+              </div>
+              <div className="form-group">
+                <input {...register("state", { required: true })} placeholder="State" className="form-control" />
+                {errors.state && <p className="text-danger">State is required.</p>}
+              </div>
+              <div className="form-group">
+                <input {...register("zip", { required: true })} placeholder="Zip" className="form-control" />
+                {errors.zip && <p className="text-danger">Zip is required.</p>}
+              </div>
 
-            <button type="submit" className="btn btn-primary">Submit</button>
-          </form>
-        </div>
-        <div className='checkout-right'>
-          <br />
-          <br />
-          Subtotal: <b>${getTotal()}</b>
-          <br />
-          Tax and Shipping: <b>${Math.round(getTotal() * 7) / 100}</b>
-          <br />
-          Total: <b>${Math.round(getTotal() * 100 + (getTotal() * 7)) / 100}</b>
+              <button type="submit" className="btn btn-primary">Submit</button>
+            </form>
+          </div>
+          <div className='checkout-right'>
+            <br />
+            <br />
+            Subtotal: <b>${getTotal()}</b>
+            <br />
+            Tax and Shipping: <b>${Math.round(getTotal() * 7) / 100}</b>
+            <br />
+            Total: <b>${Math.round(getTotal() * 100 + (getTotal() * 7)) / 100}</b>
 
+          </div>
         </div>
-      </div>
     );
   }
 
@@ -568,73 +576,74 @@ function App() {
 
   function createHeader() {
     return (
-      <header className="d-flex justify-content-center py-3">
-        <ul className="nav nav-pills">
-          <li className="nav-item">
-            <p
-              className="nav-link active"
-              id="navitem-1"
-              onClick={() => changeView(1)}
-            >
-              Students
-            </p>
-          </li>
-          <li className="nav-item">
-            <p
-              className="nav-link"
-              id="navitem-2"
-              onClick={() => changeView(2)}
-            >
-              Cats
-            </p>
-          </li>
-          <li className="nav-item">
-            <p
-              className="nav-link"
-              id="navitem-3"
-              onClick={() => changeView(3)}
-            >
-              Dogs
-            </p>
-          </li>
-          <li className="nav-item">
-            <p
-              className="nav-link"
-              id="navitem-4"
-              onClick={() => changeView(4)}
-            >
-              Checkout ({totalLength()})
-            </p>
-          </li>
-        </ul>
-      </header>
+        <header className="d-flex justify-content-center py-3">
+          <ul className="nav nav-pills">
+            <li className="nav-item">
+              <p
+                  className="nav-link active"
+                  id="navitem-1"
+                  onClick={() => changeView(1)}
+              >
+                Students
+              </p>
+            </li>
+            <li className="nav-item">
+              <p
+                  className="nav-link"
+                  id="navitem-2"
+                  onClick={() => changeView(2)}
+              >
+                Cats
+              </p>
+            </li>
+            <li className="nav-item">
+              <p
+                  className="nav-link"
+                  id="navitem-3"
+                  onClick={() => changeView(3)}
+              >
+                Dogs
+              </p>
+            </li>
+            <li className="nav-item">
+              <p
+                  className="nav-link"
+                  id="navitem-4"
+                  onClick={() => changeView(4)}
+              >
+                Checkout ({totalLength()})
+              </p>
+            </li>
+          </ul>
+        </header>
     );
   }
 
   function createFooter() {
     return (
-      <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
-        <p class="col-md-4 mb-0 text-body-secondary">
-          Com S 319
-          <br></br>Niraj Amin & Alex Gaudineer
-        </p>
-      </footer>
+        <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
+          <p class="col-md-4 mb-0 text-body-secondary">
+            Com S 319
+            <br></br>Niraj Amin & Alex Gaudineer
+          </p>
+        </footer>
     );
   }
 
   return (
-    <div>
-      {createHeader()}
-      <div className="container">
-        {viewer === 1 && <StudentView />}
-        {viewer === 2 && <CatView onProductClick={(product) => changeView(6, product)} />}  {/* Correctly passing onProductClick */}
-        {viewer === 3 && <DogView onProductClick={(product) => changeView(6, product)} />}  {/* Same here */}
-        {viewer === 4 && <CheckoutView />}
-        {viewer === 5 && <ConfirmationView />}
-        {viewer === 6 && <ProductDetailView product={selectedProduct} changeView={changeView} />}
+      <div>
+        <Navbar changeView={changeView} totalLength={totalLength} />
+        <div className="container">
+          {/* Render different views based on the `viewer` state */}
+          {viewer === 1 && <StudentView />}
+          {viewer === 2 && <CatView onProductClick={(product) => changeView(6, product)} />}
+          {viewer === 3 && <DogView onProductClick={(product) => changeView(6, product)} />}
+          {viewer === 4 && <CheckoutView />}
+          {viewer === 5 && <ConfirmationView />}
+          {viewer === 6 && <ProductDetailView product={selectedProduct} changeView={changeView} />}
+        </div>
         {createFooter()}
       </div>
-    </div>
   );
 }
 
