@@ -122,7 +122,7 @@ app.put("/product/:id/updateReview/:name", async (req, res) => {
     try {
         const name = req.params.name;
         const query = {
-            "productid": Number(req.body.id),
+            "productid": Number(req.params.id),
             "name": name
         };
 
