@@ -118,6 +118,9 @@ function App() {
                     <h3>{product.name}</h3>
                     <p>{product.description}</p>
                     <p><strong>Price:</strong> ${product.price}</p>
+                  <button type="button" variant="light" onClick={() => removeFromCart(product)} > - </button>
+                  {"  " + howMany(product) + " "}
+                  <button type="button" variant="light" onClick={() => addToCart(product)}> + </button>
                   </div>
                 </div>
               </div>
