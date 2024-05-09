@@ -21,7 +21,7 @@ function App() {
 
     // Create an array of star symbols based on the given rating
     const stars = Array.from({ length: 5 }, (_, index) =>
-        index < rating ? fullStar : emptyStar
+      index < rating ? fullStar : emptyStar
     );
 
     // Join the array of stars into a single string for display
@@ -34,14 +34,14 @@ function App() {
     let elFound = false
 
     hardCopy.map((cartEl) => {
-      if (cartEl.id == el.id){
+      if (cartEl.id == el.id) {
         cartEl.quantity += 1;
         setCart(hardCopy)
         elFound = true
       }
     })
 
-    if (!elFound){
+    if (!elFound) {
       el.quantity = 1;
       setCart([...cart, el]);
     }
@@ -51,7 +51,7 @@ function App() {
     let hardCopy = [...cart];
 
     hardCopy.map((cartEl) => {
-      if (cartEl.id == el.id){
+      if (cartEl.id == el.id) {
         cartEl.quantity -= 1;
       }
     })
@@ -114,36 +114,36 @@ function App() {
 
   const ProductRow = ({ title, products, onProductClick }) => (
 
-      <div>
-        <h2>{title}</h2>
-        <div className="row">
-          {products.map((product) => (
-              <div key={product.id} className="col-md-4">
-                <div className="card mb-3">
-                  <div
-                      onClick={() => onProductClick(product)} // Navigate to product view
-                      style={{cursor: 'pointer'}} // Cursor changes to pointer on hover
-                  >
-                    <img
-                        src={product.image}
-                        alt={product.name}
-                        className="card-img-top"
-                        style={{height: '200px', objectFit: 'cover'}}
-                    />
-                  </div>
-                  <div className="card-body">
-                    <h3>{product.name}</h3>
-                    <p>{product.description}</p>
-                    <p><strong>Price:</strong> ${product.price}</p>
-                    <button type="button" variant="light" onClick={() => removeFromCart(product)}> -</button>
-                    {"  " + howMany(product) + " "}
-                    <button type="button" variant="light" onClick={() => addToCart(product)}> +</button>
-                  </div>
-                </div>
+    <div>
+      <h2>{title}</h2>
+      <div className="row">
+        {products.map((product) => (
+          <div key={product.id} className="col-md-4">
+            <div className="card mb-3">
+              <div
+                onClick={() => onProductClick(product)} // Navigate to product view
+                style={{ cursor: 'pointer' }} // Cursor changes to pointer on hover
+              >
+                <img
+                  src={product.image}
+                  alt={product.name}
+                  className="card-img-top"
+                  style={{ height: '200px', objectFit: 'cover' }}
+                />
               </div>
-          ))}
-        </div>
+              <div className="card-body">
+                <h3>{product.name}</h3>
+                <p>{product.description}</p>
+                <p><strong>Price:</strong> ${product.price}</p>
+                <button type="button" variant="light" onClick={() => removeFromCart(product)}> -</button>
+                {"  " + howMany(product) + " "}
+                <button type="button" variant="light" onClick={() => addToCart(product)}> +</button>
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
+    </div>
   );
 
   const changeView = (viewNumber, product = null) => {
@@ -155,7 +155,7 @@ function App() {
 
   function StudentView() {
     const teacherImageAlpaca =
-        "https://www.cs.iastate.edu/files/styles/people_thumb/public/people/profilepictures/1517665937421.jpg?itok=15jJS_fr";
+      "https://www.cs.iastate.edu/files/styles/people_thumb/public/people/profilepictures/1517665937421.jpg?itok=15jJS_fr";
 
     return (
       <div className="student-view p-5" style={{ backgroundColor: "#2F4F4F" }}>
@@ -264,81 +264,13 @@ function App() {
     );
   };
 
-  const ReviewManager = ({ productId }) => {
-    const [reviews, setReviews] = useState([]);
-    const [newReviewName, setNewReviewName] = useState('');
-    const [newReviewText, setNewReviewText] = useState('');
-    const [newReviewRating, setNewReviewRating] = useState(1);
-
-    const fetchReviews = async () => {
-      console.log(productId)
-      try {
-        const response = await axios.get(`http://nirajamin.com:8081/product/${productId}/getReviews`);
-        setReviews(response.data);
-      } catch (error) {
-        console.error("Error fetching reviews:", error);
-      }
-    };
-
-    useEffect(() => {
-      fetchReviews();
-    }, [productId]);
-
-    const handleAddReview = async () => {
-      try {
-        await axios.post(
-          `http://nirajamin.com:8081/product/${productId}/addReview`,
-          {
-            productid: productId,
-            name: newReviewName,
-            text: newReviewText,
-            rating: newReviewRating,
-          }
-        );
-        fetchReviews(); // Refresh after adding
-      } catch (error) {
-        console.error("Error adding review:", error);
-      }
-    };
-
-    return (
-      <div>
-        <h2>Reviews</h2>
-        {reviews.map((review) => (
-          <Review key={review.name} productId={productId} review={review} refreshReviews={fetchReviews} />
-        ))}
-        <div>
-          <input
-            type="text"
-            placeholder="Your name"
-            value={newReviewName}
-            onChange={(e) => setNewReviewName(e.target.value)}
-          />
-          <input
-            type="text"
-            placeholder="Your review"
-            value={newReviewText}
-            onChange={(e) => setNewReviewText(e.target.value)}
-          />
-          <input
-            type="number"
-            placeholder="Rating"
-            value={newReviewRating}
-            onChange={(e) => setNewReviewRating(Number(e.target.value))}
-          />
-          <button onClick={handleAddReview}>Add Review</button>
-        </div>
-      </div>
-    );
-  };
-
   const ProductDetailView = ({ product, changeView }) => {
     const [reviews, setReviews] = useState([]);
     const [reviewName, setReviewName] = useState('');
     const [reviewText, setReviewText] = useState('');
     const [reviewRating, setReviewRating] = useState(1);
 
-    const fetchReviews = async() => {
+    const fetchReviews = async () => {
       try {
         const response = await axios.get(`http://nirajamin.com:8081/product/${product.id}/getReviews`);
         setReviews(response.data); // Set reviews in state
@@ -361,8 +293,8 @@ function App() {
         };
 
         await axios.post(
-            `http://nirajamin.com:8081/product/${product.id}/addReview`,
-            newReview
+          `http://nirajamin.com:8081/product/${product.id}/addReview`,
+          newReview
         );
 
         fetchReviews(); // Fetch updated reviews to reflect changes
@@ -393,7 +325,7 @@ function App() {
     const handleDeleteReview = async (reviewName) => {
       try {
         await axios.delete(
-            `http://nirajamin.com:8081/product/${product.id}/deleteReview/${reviewName}`
+          `http://nirajamin.com:8081/product/${product.id}/deleteReview/${reviewName}`
         );
         const remainingReviews = reviews.filter((review) => review.name !== reviewName);
         setReviews(remainingReviews); // Remove deleted review from state
@@ -404,57 +336,61 @@ function App() {
 
 
     return (
-        <div>
-          <button onClick={() => changeView(2)}>Back to Cat Products</button>
-          <h1>{product.name}</h1>
-          <img src={product.image} alt={product.name} style={{ height: '400px', objectFit: 'cover' }} />
-          <p>{product.description}</p>
-          <p><strong>Price:</strong> ${product.price}</p>
+      <div>
+        <button onClick={() => changeView(2)}>Back to Cat Products</button>
+        <h1>{product.name}</h1>
+        <img src={product.image} alt={product.name} style={{ height: '400px', objectFit: 'cover' }} />
+        <p>{product.description}</p>
+        <p><strong>Price:</strong> ${product.price}</p>
 
-          <h2>Reviews</h2>
-          {reviews.map((review) => (
-              <div key={review.name}>
-                <strong>{review.name}</strong>: {review.text} - <StarRating rating={review.rating} />
-                <button
-                    onClick={() => {
-                      const newText = prompt("Update review text", review.text);
-                      const newRating = parseInt(prompt("Update rating (1-5)", review.rating));
-                      if (newText && newRating >= 1 && newRating <= 5) {
-                        handleUpdateReview(review.name, newText, newRating);
-                      }
-                    }}
-                >
-                  Edit Review
-                </button>
-                <button onClick={() => handleDeleteReview(review.name)}>Delete Review</button>
-              </div>
-          ))}
-
-          <div>
-            <h3>Add a Review</h3>
-            <input
-                type="text"
-                placeholder="Your name"
-                value={reviewName}
-                onChange={(e) => setReviewName(e.target.value)}
-            />
-            <input
-                type="text"
-                placeholder="Your review"
-                value={reviewText}
-                onChange={(e) => setReviewText(e.target.value)}
-            />
-            <input
-                type="number"
-                placeholder="Rating (1-5)"
-                min="1"
-                max="5"
-                value={reviewRating}
-                onChange={(e) => setReviewRating(Number(e.target.value))}
-            />
-            <button onClick={handleAddReview}>Add Review</button>
+        <br />
+        <h2>Reviews</h2>
+        {reviews.map((review) => (
+          <div key={review.name}>
+            <br />
+            <strong>{review.name}</strong>: {review.text} - <StarRating rating={review.rating} />
+            <br />
+            <button
+              onClick={() => {
+                const newText = prompt("Update review text", review.text);
+                const newRating = parseInt(prompt("Update rating (1-5)", review.rating));
+                if (newText && newRating >= 1 && newRating <= 5) {
+                  handleUpdateReview(review.name, newText, newRating);
+                }
+              }}
+            >
+              Edit Review
+            </button> {" "}
+            <button onClick={() => handleDeleteReview(review.name)}>Delete Review</button>
           </div>
+        ))}
+        <br />
+        <br />
+        <div>
+          <h3>Add a Review</h3>
+          <input
+            type="text"
+            placeholder="Your name"
+            value={reviewName}
+            onChange={(e) => setReviewName(e.target.value)}
+          />
+          <input
+            type="text"
+            placeholder="Your review"
+            value={reviewText}
+            onChange={(e) => setReviewText(e.target.value)}
+          />
+          <input
+            type="number"
+            placeholder="Rating (1-5)"
+            min="1"
+            max="5"
+            value={reviewRating}
+            onChange={(e) => setReviewRating(Number(e.target.value))}
+          />
+          <button onClick={handleAddReview}>Add Review</button>
         </div>
+      </div>
     );
   };
 
@@ -478,12 +414,12 @@ function App() {
     }, []);
 
     return (
-        <div>
-          <h1>Cat Products</h1>
-          <ProductRow title="Food" products={products.food} onProductClick={onProductClick} />
-          <ProductRow title="Toys" products={products.toy} onProductClick={onProductClick} />
-          <ProductRow title="Vets" products={products.vet} onProductClick={onProductClick} />
-        </div>
+      <div>
+        <h1>Cat Products</h1>
+        <ProductRow title="Food" products={products.food} onProductClick={onProductClick} />
+        <ProductRow title="Toys" products={products.toy} onProductClick={onProductClick} />
+        <ProductRow title="Vets" products={products.vet} onProductClick={onProductClick} />
+      </div>
     );
   };
 
@@ -517,18 +453,18 @@ function App() {
     }, []); // Empty dependency array to avoid re-fetching unnecessarily
 
     return (
-        <div>
-          <h1>Dog Products</h1>
-          {Object.values(products).some((arr) => arr.length > 0) ? (
-              <>
-                <ProductRow title="Food" products={products.food} onProductClick={onProductClick} />
-                <ProductRow title="Toys" products={products.toy} onProductClick={onProductClick} />
-                <ProductRow title="Vets" products={products.vet} onProductClick={onProductClick} />
-              </>
-          ) : (
-              <div>Loading products...</div> // Show a loading message until data is fetched
-          )}
-        </div>
+      <div>
+        <h1>Dog Products</h1>
+        {Object.values(products).some((arr) => arr.length > 0) ? (
+          <>
+            <ProductRow title="Food" products={products.food} onProductClick={onProductClick} />
+            <ProductRow title="Toys" products={products.toy} onProductClick={onProductClick} />
+            <ProductRow title="Vets" products={products.vet} onProductClick={onProductClick} />
+          </>
+        ) : (
+          <div>Loading products...</div> // Show a loading message until data is fetched
+        )}
+      </div>
     );
   };
 
