@@ -234,7 +234,7 @@ function App() {
     const handleUpdateReview = async () => {
       try {
         await axios.put(
-            `http://nirajamin.com:8081/product/${productId}/updateReview/${review.name}`,
+            `http://localhost:8081/product/${productId}/updateReview/${review.name}`,
             { text: reviewText }
         );
         refreshReviews(); // Refresh after update
@@ -246,7 +246,7 @@ function App() {
     const handleDeleteReview = async () => {
       try {
         await axios.delete(
-            `http://nirajamin.com:8081/product/${productId}/deleteReview/${review.name}`
+            `http://localhost:8081/product/${productId}/deleteReview/${review.name}`
         );
         refreshReviews(); // Refresh after delete
       } catch (error) {
@@ -277,7 +277,7 @@ function App() {
 
     const fetchReviews = async () => {
       try {
-        const response = await axios.get(`http://nirajamin.com:8081/product/${product.id}/getReviews`);
+        const response = await axios.get(`http://localhost:8081/product/${product.id}/getReviews`);
         setReviews(response.data); // Set reviews in state
       } catch (error) {
         console.error("Error fetching reviews:", error);
@@ -308,7 +308,7 @@ function App() {
         };
 
         await axios.post(
-            `http://nirajamin.com:8081/product/${product.id}/addReview`,
+            `http://localhost:8081/product/${product.id}/addReview`,
             newReview
         );
 
@@ -327,7 +327,7 @@ function App() {
             }
         console.log(updatedReview)
         await axios.put(
-            `http://nirajamin.com:8081/product/${product.id}/updateReview/${reviewName}`, updatedReview
+            `http://localhost:8081/product/${product.id}/updateReview/${reviewName}`, updatedReview
 
         );
 
@@ -340,7 +340,7 @@ function App() {
     const handleDeleteReview = async (reviewName) => {
       try {
         await axios.delete(
-            `http://nirajamin.com:8081/product/${product.id}/deleteReview/${reviewName}`
+            `http://localhost:8081/product/${product.id}/deleteReview/${reviewName}`
         );
         const remainingReviews = reviews.filter((review) => review.name !== reviewName);
         setReviews(remainingReviews); // Remove deleted review from state
@@ -423,7 +423,7 @@ function App() {
 
     useEffect(() => {
       const fetchProductsByType = async (type) => {
-        const response = await axios.get(`http://nirajamin.com:8081/listProducts/cat/${type}`);
+        const response = await axios.get(`http://localhost:8081/listProducts/cat/${type}`);
         return response.data;
       };
 
@@ -458,7 +458,7 @@ function App() {
     useEffect(() => {
       const fetchProductsByType = async (type) => {
         try {
-          const response = await axios.get(`http://nirajamin.com:8081/listProducts/dog/${type}`);
+          const response = await axios.get(`http://localhost:8081/listProducts/dog/${type}`);
           return response.data; // Ensure a valid return value, even if empty
         } catch (error) {
           console.error(`Error fetching dog ${type}:`, error);
