@@ -104,7 +104,7 @@ app.delete("/product/:id/deleteReview/:name", async (req, res) => {
         await client.connect();
 
         const query = {
-            "productId": id,
+            "productid": id,
             "name": name
         };
 
@@ -133,7 +133,7 @@ app.put("/product/:id/updateReview/:name", async (req, res) => {
 
         const updateData = {
             $set: {
-                "productId": Number(req.body.id),
+                "productid": Number(req.body.id),
                 "name": req.body.name,
                 "text": req.body.text,
                 "rating": Number(req.body.rating)
