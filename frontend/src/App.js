@@ -380,7 +380,7 @@ function App() {
             placeholder="Your review"
             value={reviewText}
             onChange={(e) => setReviewText(e.target.value)}
-          />
+          />{" "}
           <input
             type="number"
             placeholder="Rating (1-5)"
@@ -388,7 +388,7 @@ function App() {
             max="5"
             value={reviewRating}
             onChange={(e) => setReviewRating(Number(e.target.value))}
-          />
+          /> ★
           <br />
           <button onClick={handleAddReview}>Add Review</button>
         </div>
