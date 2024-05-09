@@ -279,6 +279,16 @@ function App() {
       }
     };
 
+    // Determine the product category, logging for debugging
+    const productCategory = product.animal ? product.animal.toLowerCase() : 'unknown';
+
+    console.log("Product category:", productCategory); // Debugging information
+
+
+    const returnButtonText = productCategory === 'cat' ? 'Return to Cat Products' : 'Return to Dog Products';
+    const returnView = productCategory === 'cat' ? 2 : 3;
+
+
     useEffect(() => {
       fetchReviews(); // Fetch reviews on component mount
     }, [product]);
@@ -337,7 +347,7 @@ function App() {
 
     return (
       <div>
-        <button onClick={() => changeView(2)}>Back to Cat Products</button>
+        <button onClick={() => changeView(returnView)}>{returnButtonText}</button>
         <h1>{product.name}</h1>
         <img src={product.image} alt={product.name} style={{ height: '400px', objectFit: 'cover' }} />
         <p>{product.description}</p>
