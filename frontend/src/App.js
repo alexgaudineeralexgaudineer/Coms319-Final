@@ -40,33 +40,43 @@ function App() {
     return total
   }
 
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   const ProductRow = ({ title, products, handleProductSelect }) => {
-    // Ensure products is always an array to avoid runtime errors
     if (!Array.isArray(products)) {
       products = [];
     }
     return (
-      <div>
-        <h2>{title}</h2>
-        <div className="row">
-          {products.map((product) => (
-            <div key={product.id} className="col-md-4">
-              <div className="card mb-3">
-                <div className="card-body">
-                  <h3>{product.name}</h3>
-                  <button className="btn btn-info" onClick={() => handleProductSelect(product)}>View Reviews</button>
+        <div>
+          <h2>{title}</h2>
+          <div className="row">
+            {products.map((product) => (
+                <div key={product.id} className="col-md-4">
+                  <div className="card mb-3">
+                    <img
+                        src={product.image} // Product image
+                        alt={product.name} // Alt text
+                        className="card-img-top"
+                        style={{ height: '200px', objectFit: 'cover' }} // Image style
+                    />
+                    <div className="card-body">
+                      <h3>{product.name}</h3>
+                      <p>{product.description}</p>
+                      <p><strong>Price:</strong> ${product.price}</p>
+                      <button
+                          className="btn btn-info"
+                          onClick={() => handleProductSelect(product)}
+                      >
+                        View Reviews
+                      </button>
+                    </div>
+                  </div>
+                  {product.showReviews && <ReviewManager productId={product.id} />}
                 </div>
-              </div>
-              {product.showReviews && <ReviewManager productId={product.id} />}
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
     );
   };
 
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   function changeView(viewNumber) {
     const currentNavItem = "navitem-" + viewer;
     document.getElementById(currentNavItem).classList.remove("active");
@@ -74,7 +84,6 @@ function App() {
     document.getElementById("navitem-" + viewNumber).classList.add("active");
   }
 
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   function StudentView() {
     const teacherImageAlpaca =
       "https://www.cs.iastate.edu/files/styles/people_thumb/public/people/profilepictures/1517665937421.jpg?itok=15jJS_fr";
@@ -145,33 +154,6 @@ function App() {
     );
   }
 
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  const AnimalInfo = ({ animal, infotype }) => {
-    const [info, setInfo] = useState('');
-
-    useEffect(() => {
-      const fetchInfo = async () => {
-        try {
-          const response = await axios.get(`http://nirajamin.com:8081/${animal}/${infotype}`);
-          const data = response.data.length ? response.data[0].description : 'No information available';
-          setInfo(data);
-        } catch (error) {
-          console.error(`Error fetching ${animal} ${infotype}:`, error);
-        }
-      };
-
-      fetchInfo();
-    }, [animal, infotype]);
-
-    return (
-      <div>
-        <h2>{animal} {infotype}</h2>
-        <p>{info}</p>
-      </div>
-    );
-  };
-
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   const Review = ({ productId, review, refreshReviews }) => {
     const [reviewText, setReviewText] = useState(review.text);
 
@@ -213,7 +195,6 @@ function App() {
     );
   };
 
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   const ReviewManager = ({ productId }) => {
     const [reviews, setReviews] = useState([]);
     const [newReviewName, setNewReviewName] = useState('');
@@ -280,96 +261,108 @@ function App() {
     );
   };
 
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   const CatView = () => {
-    const [products, setProducts] = useState({ food: [], toys: [], vets: [] });
+    const [products, setProducts] = useState({ food: [], toy: [], vet: [] });
 
-    const handleProductSelect = (product) => {
-      setProducts((prevProducts) => {
-        const newProducts = { ...prevProducts };
-        const category = Object.keys(newProducts).find((cat) => newProducts[cat].some((p) => p.id === product.id));
-        newProducts[category] = newProducts[category].map((p) =>
-          p.id === product.id ? { ...p, showReviews: !p.showReviews } : p
-        );
-        return newProducts;
-      });
-    };
+
     useEffect(() => {
       const fetchProductsByType = async (type) => {
         try {
-          const response = await axios.get(`http://nirajamin.com:8081/cat/${type}`);
+          const response = await axios.get(`http://nirajamin.com:8081/listProducts/cat/${type}`);
           return response.data;
         } catch (error) {
           console.error(`Error fetching cat ${type}:`, error);
         }
       };
 
+
       const fetchProducts = async () => {
-        const food = await fetchProductsByType("food");
-        const toys = await fetchProductsByType("toys");
-        const vets = await fetchProductsByType("vets");
-        setProducts({ food, toys, vets });
+        const food = await fetchProductsByType('food');
+        const toy = await fetchProductsByType('toy');
+        const vet = await fetchProductsByType('vet');
+        setProducts({ food, toy, vet });
       };
+
 
       fetchProducts();
     }, []);
 
-    return (
-      <div>
-        <h1>Cat Products</h1>
-        <ProductRow title="Food" products={products.food} handleProductSelect={handleProductSelect} />
-        <ProductRow title="Toys" products={products.toys} handleProductSelect={handleProductSelect} />
-        <ProductRow title="Vets" products={products.vets} handleProductSelect={handleProductSelect} />
-      </div>
-    );
-  };
-
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  const DogView = () => {
-    const [products, setProducts] = useState({ food: [], toys: [], vets: [] });
 
     const handleProductSelect = (product) => {
       setProducts((prevProducts) => {
         const newProducts = { ...prevProducts };
-        const category = Object.keys(newProducts).find((cat) => newProducts[cat].some((p) => p.id === product.id));
+        const category = Object.keys(newProducts).find((cat) =>
+            newProducts[cat].some((p) => p.id === product.id)
+        );
         newProducts[category] = newProducts[category].map((p) =>
-          p.id === product.id ? { ...p, showReviews: !p.showReviews } : p
+            p.id === product.id ? { ...p, showReviews: !p.showReviews } : p
         );
         return newProducts;
       });
     };
 
+
+    return (
+        <div>
+          <h1>Cat Products</h1>
+          <ProductRow title="Food" products={products.food} handleProductSelect={handleProductSelect} />
+          <ProductRow title="Toys" products={products.toy} handleProductSelect={handleProductSelect} />
+          <ProductRow title="Vets" products={products.vet} handleProductSelect={handleProductSelect} />
+        </div>
+    );
+  };
+
+  const DogView = () => {
+    const [products, setProducts] = useState({ food: [], toy: [], vet: [] });
+
+
     useEffect(() => {
       const fetchProductsByType = async (type) => {
         try {
-          const response = await axios.get(`http://nirajamin.com:8081/dog/${type}`);
+          const response = await axios.get(`http://nirajamin.com:8081/listProducts/dog/${type}`);
           return response.data;
         } catch (error) {
           console.error(`Error fetching dog ${type}:`, error);
         }
       };
 
+
       const fetchProducts = async () => {
-        const food = await fetchProductsByType("food");
-        const toys = await fetchProductsByType("toys");
-        const vets = await fetchProductsByType("vets");
-        setProducts({ food, toys, vets });
+        const food = await fetchProductsByType('food');
+        const toy = await fetchProductsByType('toy');
+        const vet = await fetchProductsByType('vet');
+        setProducts({ food, toy, vet });
       };
+
 
       fetchProducts();
     }, []);
 
+
+    const handleProductSelect = (product) => {
+      setProducts((prevProducts) => {
+        const newProducts = { ...prevProducts };
+        const category = Object.keys(newProducts).find((cat) =>
+            newProducts[cat].some((p) => p.id === product.id)
+        );
+        newProducts[category] = newProducts[category].map((p) =>
+            p.id === product.id ? { ...p, showReviews: !p.showReviews } : p
+        );
+        return newProducts;
+      });
+    };
+
+
     return (
-      <div>
-        <h1>Dog Products</h1>
-        <ProductRow title="Food" products={products.food} handleProductSelect={handleProductSelect} />
-        <ProductRow title="Toys" products={products.toys} handleProductSelect={handleProductSelect} />
-        <ProductRow title="Vets" products={products.vets} handleProductSelect={handleProductSelect} />
-      </div>
+        <div>
+          <h1>Dog Products</h1>
+          <ProductRow title="Food" products={products.food} handleProductSelect={handleProductSelect} />
+          <ProductRow title="Toys" products={products.toy} handleProductSelect={handleProductSelect} />
+          <ProductRow title="Vets" products={products.vet} handleProductSelect={handleProductSelect} />
+        </div>
     );
   };
 
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   const CheckoutView = () => {
     const { register, handleSubmit, formState: { errors } } = useForm();
 
@@ -438,7 +431,7 @@ function App() {
       </div>
     );
   }
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
   const ConfirmationView = () => {
 
     const updateHooks = () => {
@@ -456,7 +449,7 @@ function App() {
       <button onClick={updateHooks} className="btn btn-secondary">Submit</button>
     </div>);
   }
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
   function createHeader() {
     return (
       <header className="d-flex justify-content-center py-3">
@@ -502,7 +495,6 @@ function App() {
     );
   }
 
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   function createFooter() {
     return (
       <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
@@ -514,7 +506,6 @@ function App() {
     );
   }
 
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   return (
     <div>
       {createHeader()}
