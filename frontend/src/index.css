@@ -45,3 +45,12 @@ code {
   padding-left: 15px;
   width: 10vw; 
 }
+
+.flex-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.padd-right {
+  padding-right: 23px;
+}

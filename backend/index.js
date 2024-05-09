@@ -23,7 +23,6 @@ app.listen(port, () => {
 });
 
 app.get("/listProducts/:animal/:infotype", async (req, res) => {
-    console.log("Instead here")
     const infotype = req.params.infotype;
     const animal = req.params.animal;
     await client.connect();
