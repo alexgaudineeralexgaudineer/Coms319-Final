@@ -1,36 +1,58 @@
 /* App.css */
-
-/* Basic reset for margins and padding */
-body {
-  margin: 0;
-  padding: 0;
-  font-family: 'Arial', sans-serif;
-}
-
-/* Navbar styling */
 .navbar {
-  background-color: #333;
-  color: #6c2121;
-  padding: 10px;
+  background-color: #3e67ce; /* Example color for navbar background */
+}
+
+.navbar-brand {
+
+  font-size: 45px;
+  color: #dddddd;
+  padding-right: 20px;
+}
+header {
+  background-color: #d5d6d8; /* Background color for the entire header */
+}
+
+.navbar-brand:hover {
+  color: #3e67ce;
+}
+
+.page-background {
+  background-color: #839fe6;
+}
+
+.product-name {
+  font-weight: bold;
+}
+
+.product-description {
+  color: grey;
+}
+
+.author-text {
+  padding-top: 5px;
+  font-size: 35px;
+  font-weight: bold;
+}
+
+.about-header {
+  font-weight: bold;
+  font-size: 50px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  text-align: center;
+  margin: auto;
+  width: 90%;
+}
+
+.row {
+  padding-top: 70px;
   display: flex;
-  justify-content: center;
 }
 
-.nav {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-}
-
-.nav-item {
-  margin-right: 15px;
-}
-
-.nav-link {
-  color: white;
-  text-decoration: none;
-  cursor: pointer;
+.column {
+  text-align: center;
+  flex: 50%;
 }
 
 .nav-link.active {
@@ -40,12 +62,12 @@ body {
 /* Main content styling */
 .main-content {
   padding: 20px;
-  background-color: rgba(134, 118, 118, 0.66);
+  background-color: rgba(248, 248, 248, 0.66);
 }
 
 /* Footer styling */
 .footer {
-  background-color: #333;
+  background-color: #fdfdfd;
   color: white;
   text-align: center;
   padding: 10px;
@@ -56,10 +78,22 @@ body {
 
 /* Example: App.css */
 .navbar-nav .nav-link {
-  color: #000; /* Default color for navbar links */
+  color: #d1aeda; /* Default color for navbar links */
 }
 
 .navbar-nav .nav-item.active .nav-link {
   font-weight: bold; /* Bold font for the active tab */
-  color: #007bff; /* Change color to highlight the active tab */
+  color: #a2afbd; /* Change color to highlight the active tab */
+}
+
+.page-background {
+  background-color: rgba(163, 153, 153, 0.09);
+}
+
+.product-name {
+  font-weight: bold;
+}
+
+.product-description {
+  color: #ffffff;
 }

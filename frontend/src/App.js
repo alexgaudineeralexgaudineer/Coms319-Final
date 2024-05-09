@@ -115,7 +115,11 @@ function App() {
 
   const ProductRow = ({ title, products, onProductClick }) => (
       <div>
-        <h2>{title}</h2>
+        <h2>
+
+          {title}
+
+        </h2>
         <div className="row">
           {products.map((product) => (
               <div key={product.id} className="col-md-4">
@@ -151,7 +155,7 @@ function App() {
     if (product) {
       setSelectedProduct(product);
     }
-    
+
   };
 
   function StudentView() {
@@ -631,7 +635,7 @@ function App() {
   }
 
   return (
-      <div>
+      <div className="page-background"> {/* Apply 'page-background' */}
         <Navbar changeView={changeView} totalLength={totalLength} />
         <div className="container">
           {/* Render different views based on the `viewer` state */}
