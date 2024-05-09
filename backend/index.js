@@ -58,12 +58,11 @@ app.get("/product/:id", async (req, res) => {
 });
 
 app.get("/product/:id/getReviews", async (req, res) => {
-    console.log("here")
     const id = Number(req.params.id);
     await client.connect();
 
     const query = {
-        "productId": id
+        "productid": id
     };
     const results = await db
         .collection("reviews")
@@ -79,7 +78,7 @@ app.post("/product/:id/addReview", async (req, res) => {
         await client.connect();
 
         const newReview = {
-            "productId": Number(req.body.id),
+            "productid": Number(req.body.id),
             "name": req.body.name,
             "text": req.body.text,
             "rating": Number(req.body.rating)
