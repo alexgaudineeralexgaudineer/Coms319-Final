@@ -78,7 +78,7 @@ app.post("/product/:id/addReview", async (req, res) => {
 
         const newReview = {
             "productid": Number(req.body.productid),
-            "name": req.body.name,
+            "name": req.body.name.trim(),
             "text": req.body.text,
             "rating": Number(req.body.rating)
         };
@@ -97,7 +97,7 @@ app.post("/product/:id/addReview", async (req, res) => {
 
 app.delete("/product/:id/deleteReview/:name", async (req, res) => {
     try {
-        const name = req.params.name;
+        const name = req.params.name.trim();
         const id = Number(req.params.id);
         await client.connect();
 
@@ -120,7 +120,7 @@ app.delete("/product/:id/deleteReview/:name", async (req, res) => {
 
 app.put("/product/:id/updateReview/:name", async (req, res) => {
     try {
-        const name = req.params.name;
+        const name = req.params.name.trim();
         const query = {
             "productid": Number(req.params.id),
             "name": name
