@@ -372,15 +372,12 @@ function App() {
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   const CheckoutView = () => {
     const { register, handleSubmit, formState: { errors } } = useForm();
-    const [dataF, setDataF] = useState({});
-    const [viewer, setViewer] = useState(0);
 
     const onSubmit = data => {
-      console.log(data); // log all data
-      console.log(data.fullName); // log only fullname
       // update hooks
-      setDataF(data);
-      setViewer(1);
+      setCart([]);
+      setCheckoutData(data);
+      changeView(5)
       data = {}
     }
 
@@ -431,11 +428,11 @@ function App() {
         <div className='checkout-right'>
           <br />
           <br />
-          Subtotal: { getTotal() }
+          Subtotal: {getTotal()}
           <br />
-          Tax and Shipping: { getTotal() * 0.07 }
+          Tax and Shipping: {getTotal() * 0.07}
           <br />
-          Total: { getTotal() + (getTotal() * 0.07) }
+          Total: {getTotal() + (getTotal() * 0.07)}
 
         </div>
       </div>
@@ -444,6 +441,20 @@ function App() {
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   const ConfirmationView = () => {
 
+    const updateHooks = () => {
+      changeView(1);
+      setCheckoutData({});
+  };
+
+    return (<div>
+      <h1>Payment summary:</h1>
+      <h3>{checkoutData.fullName}</h3>
+      <p>{checkoutData.email}</p>
+      <p>{checkoutData.creditCard}</p>
+      <p>{checkoutData.address}</p>
+      <p>{checkoutData.city},{checkoutData.state} {checkoutData.zip} </p>
+      <button onClick={updateHooks} className="btn btn-secondary">Submit</button>
+    </div>);
   }
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   function createHeader() {
