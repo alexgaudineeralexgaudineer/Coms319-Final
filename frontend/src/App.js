@@ -139,27 +139,46 @@ function App() {
   function StudentView() {
     const teacherImageAlpaca =
       "https://www.cs.iastate.edu/files/styles/people_thumb/public/people/profilepictures/1517665937421.jpg?itok=15jJS_fr";
+    const teacherImageJannesari =
+      "https://www.cs.iastate.edu/files/styles/people_thumb/public/people/profilepictures/ali_janessari1.jpg?itok=L9OV3HlA";
 
     return (
       <div className="student-view p-5" style={{ backgroundColor: "#2F4F4F" }}>
         <div className="container-fluid py-5 bg-dark text-white rounded shadow-lg">
           <h1 className="display-4 text-center text-info">SE/COMS 319</h1>
           <p className="fs-4 text-center text-light">
-            SE/COMS 319 teaches website programming and creation at Iowa State University.
+          Construction of User Interfaces, Spring 2024
           </p>
         </div>
 
+
         <div className="container-fluid p-4 rounded-lg" style={{ backgroundColor: "#778899" }}>
-          <h2 className="text-center text-warning">Professor</h2>
+          <h2 className="text-center text-warning">Professors</h2>
           <div className="d-flex justify-content-center">
-            <div className="card bg-light text-dark p-3 rounded-lg shadow-lg" style={{ border: "2px solid #FFD700" }}>
-              <h3 className="text-center">Professor Aldaco</h3>
-              <img
-                className="rounded-circle"
-                src={teacherImageAlpaca}
-                alt="Professor Alpaca"
-                style={{ width: "120px", border: "3px solid #FFD700" }}
-              />
+            <div className='flex-row'>
+              <div className='padd-right'>
+                <div className="card bg-light text-dark p-3 rounded-lg shadow-lg" style={{ border: "2px solid #FFD700" }}>
+                  <h3 className="text-center">Dr. Abraham N. <br />Aldaco Gastelum</h3>
+                  <p>aaldaco@iastate.edu</p>
+                  <img
+                    className="rounded-circle"
+                    src={teacherImageAlpaca}
+                    alt="Dr. Abraham N. Aldaco Gastelum"
+                    style={{ width: "120px", border: "3px solid #FFD700" }}
+                  />
+                </div>
+              </div>
+
+              <div className="card bg-light text-dark p-3 rounded-lg shadow-lg" style={{ border: "2px solid #FFD700" }}>
+                <h3 className="text-center">Dr. Ali Jannesari<br />‎ </h3>
+                <p>jannesar@iastate.edu</p>
+                <img
+                  className="rounded-circle"
+                  src={teacherImageJannesari}
+                  alt="Dr. Ali Jannesari"
+                  style={{ width: "120px", border: "3px solid #FFD700" }}
+                />
+              </div>
             </div>
           </div>
         </div>
