@@ -22,7 +22,8 @@ app.listen(port, () => {
     console.log("App listening at http://%s:%s", host, port);
 });
 
-app.get("/:animal/:infotype", async (req, res) => {
+app.get("/listProducts/:animal/:infotype", async (req, res) => {
+    console.log("Instead here")
     const infotype = req.params.infotype;
     const animal = req.params.animal;
     await client.connect();
@@ -40,7 +41,7 @@ app.get("/:animal/:infotype", async (req, res) => {
     res.send(results);
 });
 
-app.get("/:id", async (req, res) => {
+app.get("/product/:id", async (req, res) => {
     const id = Number(req.params.id);
     await client.connect();
 
@@ -56,7 +57,8 @@ app.get("/:id", async (req, res) => {
     res.send(results);
 });
 
-app.get("/:id/getReviews", async (req, res) => {
+app.get("/product/:id/getReviews", async (req, res) => {
+    console.log("here")
     const id = Number(req.params.id);
     await client.connect();
 
@@ -72,7 +74,7 @@ app.get("/:id/getReviews", async (req, res) => {
     res.send(results);
 });
 
-app.post("/:id/addReview", async (req, res) => {
+app.post("/product/:id/addReview", async (req, res) => {
     try {
         await client.connect();
 
@@ -95,7 +97,7 @@ app.post("/:id/addReview", async (req, res) => {
     }
 });
 
-app.delete("/:id/deleteReview/:name", async (req, res) => {
+app.delete("/product/:id/deleteReview/:name", async (req, res) => {
     try {
         const name = req.params.name;
         const id = Number(req.params.id);
@@ -118,7 +120,7 @@ app.delete("/:id/deleteReview/:name", async (req, res) => {
     }
 });
 
-app.put("/:id/updateReview/:name", async (req, res) => {
+app.put("/product/:id/updateReview/:name", async (req, res) => {
     try {
         const id = Number(req.params.id);
         const name = req.params.name;
