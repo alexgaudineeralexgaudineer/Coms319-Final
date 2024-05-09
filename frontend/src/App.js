@@ -32,8 +32,8 @@ function App() {
                     />
                     <div className="card-body">
                       <h3>{product.name}</h3>
-                      <p>{product.description}</p> // Description
-                      <p><strong>Price:</strong> ${product.price}</p> // Price
+                      <p>{product.description}</p>
+                      <p><strong>Price:</strong> ${product.price}</p>
                       <button
                           className="btn btn-info"
                           onClick={() => handleProductSelect(product)}
@@ -42,7 +42,7 @@ function App() {
                       </button>
                     </div>
                   </div>
-                  {product.showReviews && <ReviewManager productId={product.id} />} // Conditional review display
+                  {product.showReviews && <ReviewManager productId={product.id} />}
                 </div>
             ))}
           </div>
@@ -266,7 +266,7 @@ const ReviewManager = ({ productId }) => {
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   const CatView = () => {
-    const [products, setProducts] = useState({ food: [], toys: [], vets: [] });
+    const [products, setProducts] = useState({ food: [], toy: [], vet: [] });
 
     useEffect(() => {
       const fetchProductsByType = async (type) => {
@@ -280,9 +280,9 @@ const ReviewManager = ({ productId }) => {
 
       const fetchProducts = async () => {
         const food = await fetchProductsByType('food');
-        const toys = await fetchProductsByType('toys');
-        const vets = await fetchProductsByType('vets');
-        setProducts({ food, toys, vets });
+        const toy = await fetchProductsByType('toy');
+        const vet = await fetchProductsByType('vet');
+        setProducts({ food, toy, vet });
       };
 
       fetchProducts();
@@ -305,15 +305,15 @@ const ReviewManager = ({ productId }) => {
         <div>
           <h1>Cat Products</h1>
           <ProductRow title="Food" products={products.food} handleProductSelect={handleProductSelect} />
-          <ProductRow title="Toys" products={products.toys} handleProductSelect={handleProductSelect} />
-          <ProductRow title="Vets" products={products.vets} handleProductSelect={handleProductSelect} />
+          <ProductRow title="Toys" products={products.toy} handleProductSelect={handleProductSelect} />
+          <ProductRow title="Vets" products={products.vet} handleProductSelect={handleProductSelect} />
         </div>
     );
   };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   const DogView = () => {
-    const [products, setProducts] = useState({ food: [], toys: [], vets: [] });
+    const [products, setProducts] = useState({ food: [], toy: [], vet: [] });
 
     useEffect(() => {
       const fetchProductsByType = async (type) => {
@@ -327,9 +327,9 @@ const ReviewManager = ({ productId }) => {
 
       const fetchProducts = async () => {
         const food = await fetchProductsByType('food');
-        const toys = await fetchProductsByType('toys');
-        const vets = await fetchProductsByType('vets');
-        setProducts({ food, toys, vets });
+        const toy = await fetchProductsByType('toy');
+        const vet = await fetchProductsByType('vet');
+        setProducts({ food, toy, vet });
       };
 
       fetchProducts();
@@ -352,8 +352,8 @@ const ReviewManager = ({ productId }) => {
         <div>
           <h1>Dog Products</h1>
           <ProductRow title="Food" products={products.food} handleProductSelect={handleProductSelect} />
-          <ProductRow title="Toys" products={products.toys} handleProductSelect={handleProductSelect} />
-          <ProductRow title="Vets" products={products.vets} handleProductSelect={handleProductSelect} />
+          <ProductRow title="Toys" products={products.toy} handleProductSelect={handleProductSelect} />
+          <ProductRow title="Vets" products={products.vet} handleProductSelect={handleProductSelect} />
         </div>
     );
   };
