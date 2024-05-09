@@ -120,10 +120,9 @@ app.delete("/product/:id/deleteReview/:name", async (req, res) => {
 
 app.put("/product/:id/updateReview/:name", async (req, res) => {
     try {
-        const id = Number(req.params.productid);
         const name = req.params.name;
         const query = {
-            "productid": productid,
+            "productid": Number(req.body.id),
             "name": name
         };
 

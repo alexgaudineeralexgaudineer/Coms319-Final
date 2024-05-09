@@ -373,13 +373,15 @@ function App() {
 
     const handleUpdateReview = async (reviewName, newText, newRating) => {
       try {
+        const updatedReview =
+        {
+          text: newText,
+          rating: newRating
+        }
+        console.log(updatedReview)
         await axios.put(
-            `http://nirajamin.com:8081/product/${product.id}/updateReview/${reviewName}`,
-            { 
-              productid: product.id,
-              text: newText, 
-              rating: newRating 
-            }
+          `http://nirajamin.com:8081/product/${product.id}/updateReview/${reviewName}`, updatedReview
+
         );
 
         fetchReviews(); // Fetch updated reviews to reflect changes
