@@ -78,7 +78,7 @@ app.post("/product/:id/addReview", async (req, res) => {
         await client.connect();
 
         const newReview = {
-            "productid": Number(req.body.id),
+            "productid": Number(req.body.productid),
             "name": req.body.name,
             "text": req.body.text,
             "rating": Number(req.body.rating)
