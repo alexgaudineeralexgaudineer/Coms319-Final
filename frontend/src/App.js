@@ -229,7 +229,7 @@ function App() {
     const handleUpdateReview = async () => {
       try {
         await axios.put(
-          `http://nirajamin.com:8081/${productId}/updateReview/${review.name}`,
+          `http://nirajamin.com:8081/product/${productId}/updateReview/${review.name}`,
           { text: reviewText }
         );
         refreshReviews(); // Refresh after update
@@ -241,7 +241,7 @@ function App() {
     const handleDeleteReview = async () => {
       try {
         await axios.delete(
-          `http://nirajamin.com:8081/${productId}/deleteReview/${review.name}`
+          `http://nirajamin.com:8081/product/${productId}/deleteReview/${review.name}`
         );
         refreshReviews(); // Refresh after delete
       } catch (error) {
@@ -271,8 +271,9 @@ function App() {
     const [newReviewRating, setNewReviewRating] = useState(1);
 
     const fetchReviews = async () => {
+      console.log(productId)
       try {
-        const response = await axios.get(`http://nirajamin.com:8081/${productId}/getReviews`);
+        const response = await axios.get(`http://nirajamin.com:8081/product/${productId}/getReviews`);
         setReviews(response.data);
       } catch (error) {
         console.error("Error fetching reviews:", error);
@@ -286,8 +287,9 @@ function App() {
     const handleAddReview = async () => {
       try {
         await axios.post(
-          `http://localhost:8081/${productId}/addReview`,
+          `http://nirajamin.com:8081/product/${productId}/addReview`,
           {
+            productid: productId,
             name: newReviewName,
             text: newReviewText,
             rating: newReviewRating,
@@ -336,28 +338,18 @@ function App() {
     const [reviewText, setReviewText] = useState('');
     const [reviewRating, setReviewRating] = useState(1);
 
-    useEffect(() => {
-      const fetchReviews = async () => {
-        if (!product || !product.id) return;
-        try {
-          const response = await axios.get(`http://nirajamin.com:8081/product/${product.id}/getReviews`);
-          setReviews(response.data); // Set reviews in state
-        } catch (error) {
-          console.error("Error fetching reviews:", error);
-        }
-      };
-
-      fetchReviews(); // Fetch reviews on component mount
-    }, [product]);
-
-    const refreshReviews = async () => {
+    const fetchReviews = async() => {
       try {
         const response = await axios.get(`http://nirajamin.com:8081/product/${product.id}/getReviews`);
-        setReviews(response.data); // Refresh state with updated reviews
+        setReviews(response.data); // Set reviews in state
       } catch (error) {
-        console.error("Error refreshing reviews:", error);
+        console.error("Error fetching reviews:", error);
       }
     };
+
+    useEffect(() => {
+      fetchReviews(); // Fetch reviews on component mount
+    }, [product]);
 
     const handleAddReview = async () => {
       try {
@@ -373,7 +365,7 @@ function App() {
             newReview
         );
 
-        refreshReviews(); // Fetch updated reviews to reflect changes
+        fetchReviews(); // Fetch updated reviews to reflect changes
       } catch (error) {
         console.error("Error adding review:", error);
       }
@@ -383,14 +375,19 @@ function App() {
       try {
         await axios.put(
             `http://nirajamin.com:8081/product/${product.id}/updateReview/${reviewName}`,
-            { text: newText, rating: newRating }
+            { 
+              productid: product.id,
+              text: newText, 
+              rating: newRating 
+            }
         );
 
-        refreshReviews(); // Fetch updated reviews to reflect changes
+        fetchReviews(); // Fetch updated reviews to reflect changes
       } catch (error) {
         console.error("Error updating review:", error);
       }
     };
+
     const handleDeleteReview = async (reviewName) => {
       try {
         await axios.delete(

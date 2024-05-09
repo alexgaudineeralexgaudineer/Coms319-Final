@@ -120,10 +120,10 @@ app.delete("/product/:id/deleteReview/:name", async (req, res) => {
 
 app.put("/product/:id/updateReview/:name", async (req, res) => {
     try {
-        const id = Number(req.params.id);
+        const id = Number(req.params.productid);
         const name = req.params.name;
         const query = {
-            "id": id,
+            "productid": productid,
             "name": name
         };
 
@@ -132,7 +132,7 @@ app.put("/product/:id/updateReview/:name", async (req, res) => {
         const updateData = {
             $set: {
                 "productid": Number(req.body.id),
-                "name": req.body.name,
+                "name": name,
                 "text": req.body.text,
                 "rating": Number(req.body.rating)
             }
