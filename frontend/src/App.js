@@ -13,6 +13,8 @@ function App() {
   const [viewer, setViewer] = useState(1);
   const [checkoutData, setCheckoutData] = useState({});
   const [cart, setCart] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+
 
   const addToCart = (el) => {
     setCart([...cart, el]);
@@ -40,49 +42,38 @@ function App() {
     return total
   }
 
-  const ProductRow = ({ title, products, handleProductSelect }) => {
-    if (!Array.isArray(products)) {
-      products = [];
-    }
-    return (
-        <div>
-          <h2>{title}</h2>
-          <div className="row">
-            {products.map((product) => (
-                <div key={product.id} className="col-md-4">
-                  <div className="card mb-3">
-                    <img
-                        src={product.image} // Product image
-                        alt={product.name} // Alt text
-                        className="card-img-top"
-                        style={{ height: '200px', objectFit: 'cover' }} // Image style
-                    />
-                    <div className="card-body">
-                      <h3>{product.name}</h3>
-                      <p>{product.description}</p>
-                      <p><strong>Price:</strong> ${product.price}</p>
-                      <button
-                          className="btn btn-info"
-                          onClick={() => handleProductSelect(product)}
-                      >
-                        View Reviews
-                      </button>
-                    </div>
-                  </div>
-                  {product.showReviews && <ReviewManager productId={product.id} />}
-                </div>
-            ))}
-          </div>
-        </div>
-    );
-  };
+  const ProductRow = ({ title, products, onProductClick }) => (
 
-  function changeView(viewNumber) {
-    const currentNavItem = "navitem-" + viewer;
-    document.getElementById(currentNavItem).classList.remove("active");
+      <div>
+        <h2>{title}</h2>
+        <div className="row">
+          {products.map((product) => (
+              <div key={product.id} className="col-md-4">
+                <div className="card mb-3" onClick={() => onProductClick(product)}>
+                  <img
+                      src={product.image}
+                      alt={product.name}
+                      className="card-img-top"
+                      style={{ height: '200px', objectFit: 'cover' }}
+                  />
+                  <div className="card-body">
+                    <h3>{product.name}</h3>
+                    <p>{product.description}</p>
+                    <p><strong>Price:</strong> ${product.price}</p>
+                  </div>
+                </div>
+              </div>
+          ))}
+        </div>
+      </div>
+  );
+
+  const changeView = (viewNumber, product = null) => {
     setViewer(viewNumber);
-    document.getElementById("navitem-" + viewNumber).classList.add("active");
-  }
+    if (product) {
+      setSelectedProduct(product);
+    }
+  };
 
   function StudentView() {
     const teacherImageAlpaca =
@@ -261,20 +252,30 @@ function App() {
     );
   };
 
-  const CatView = () => {
-    const [products, setProducts] = useState({ food: [], toy: [], vet: [] });
+  const ProductDetailView = ({ product, changeView }) => {
+    if (!product) {
+      return <div>No product selected.</div>;
+    }
 
+    return (
+        <div>
+          <button onClick={() => changeView(2)}>Back to Cat Products</button>
+          <h1>{product.name}</h1>
+          <img src={product.image} alt={product.name} style={{ height: '400px', objectFit: 'cover' }} />
+          <p>{product.description}</p>
+          <p><strong>Price:</strong> ${product.price}</p>
+        </div>
+    );
+  };
+
+  const CatView = ({ onProductClick }) => {
+    const [products, setProducts] = useState({ food: [], toy: [], vet: [] });
 
     useEffect(() => {
       const fetchProductsByType = async (type) => {
-        try {
-          const response = await axios.get(`http://nirajamin.com:8081/listProducts/cat/${type}`);
-          return response.data;
-        } catch (error) {
-          console.error(`Error fetching cat ${type}:`, error);
-        }
+        const response = await axios.get(`http://nirajamin.com:8081/listProducts/cat/${type}`);
+        return response.data;
       };
-
 
       const fetchProducts = async () => {
         const food = await fetchProductsByType('food');
@@ -283,86 +284,64 @@ function App() {
         setProducts({ food, toy, vet });
       };
 
-
       fetchProducts();
     }, []);
-
-
-    const handleProductSelect = (product) => {
-      setProducts((prevProducts) => {
-        const newProducts = { ...prevProducts };
-        const category = Object.keys(newProducts).find((cat) =>
-            newProducts[cat].some((p) => p.id === product.id)
-        );
-        newProducts[category] = newProducts[category].map((p) =>
-            p.id === product.id ? { ...p, showReviews: !p.showReviews } : p
-        );
-        return newProducts;
-      });
-    };
-
 
     return (
         <div>
           <h1>Cat Products</h1>
-          <ProductRow title="Food" products={products.food} handleProductSelect={handleProductSelect} />
-          <ProductRow title="Toys" products={products.toy} handleProductSelect={handleProductSelect} />
-          <ProductRow title="Vets" products={products.vet} handleProductSelect={handleProductSelect} />
+          <ProductRow title="Food" products={products.food} onProductClick={onProductClick} />
+          <ProductRow title="Toys" products={products.toy} onProductClick={onProductClick} />
+          <ProductRow title="Vets" products={products.vet} onProductClick={onProductClick} />
         </div>
     );
   };
 
-  const DogView = () => {
-    const [products, setProducts] = useState({ food: [], toy: [], vet: [] });
-
+  const DogView = ({ onProductClick }) => {
+    // Initialize products with a default structure to avoid undefined errors
+    const [products, setProducts] = useState({
+      food: [],
+      toy: [],
+      vet: []
+    });
 
     useEffect(() => {
       const fetchProductsByType = async (type) => {
         try {
           const response = await axios.get(`http://nirajamin.com:8081/listProducts/dog/${type}`);
-          return response.data;
+          return response.data; // Ensure a valid return value, even if empty
         } catch (error) {
           console.error(`Error fetching dog ${type}:`, error);
+          return []; // Return an empty array to avoid undefined errors
         }
       };
-
 
       const fetchProducts = async () => {
         const food = await fetchProductsByType('food');
         const toy = await fetchProductsByType('toy');
         const vet = await fetchProductsByType('vet');
-        setProducts({ food, toy, vet });
+        setProducts({ food, toy, vet }); // Assign the fetched values
       };
 
-
-      fetchProducts();
-    }, []);
-
-
-    const handleProductSelect = (product) => {
-      setProducts((prevProducts) => {
-        const newProducts = { ...prevProducts };
-        const category = Object.keys(newProducts).find((cat) =>
-            newProducts[cat].some((p) => p.id === product.id)
-        );
-        newProducts[category] = newProducts[category].map((p) =>
-            p.id === product.id ? { ...p, showReviews: !p.showReviews } : p
-        );
-        return newProducts;
-      });
-    };
-
+      fetchProducts(); // Ensure this only runs once (similar to componentDidMount)
+    }, []); // Empty dependency array to avoid re-fetching unnecessarily
 
     return (
         <div>
           <h1>Dog Products</h1>
-          <ProductRow title="Food" products={products.food} handleProductSelect={handleProductSelect} />
-          <ProductRow title="Toys" products={products.toy} handleProductSelect={handleProductSelect} />
-          <ProductRow title="Vets" products={products.vet} handleProductSelect={handleProductSelect} />
+          {Object.values(products).some((arr) => arr.length > 0) ? (
+              <>
+                <ProductRow title="Food" products={products.food} onProductClick={onProductClick} />
+                <ProductRow title="Toys" products={products.toy} onProductClick={onProductClick} />
+                <ProductRow title="Vets" products={products.vet} onProductClick={onProductClick} />
+              </>
+          ) : (
+              <div>Loading products...</div> // Show a loading message until data is fetched
+          )}
         </div>
     );
   };
-
+  
   const CheckoutView = () => {
     const { register, handleSubmit, formState: { errors } } = useForm();
 
@@ -511,10 +490,11 @@ function App() {
       {createHeader()}
       <div className="container">
         {viewer === 1 && <StudentView />}
-        {viewer === 2 && <CatView />}
-        {viewer === 3 && <DogView />}
+        {viewer === 2 && <CatView onProductClick={(product) => changeView(6, product)} />}  {/* Correctly passing onProductClick */}
+        {viewer === 3 && <DogView onProductClick={(product) => changeView(6, product)} />}  {/* Same here */}
         {viewer === 4 && <CheckoutView />}
         {viewer === 5 && <ConfirmationView />}
+        {viewer === 6 && <ProductDetailView product={selectedProduct} changeView={changeView} />}
         {createFooter()}
       </div>
     </div>
