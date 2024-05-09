@@ -13,6 +13,8 @@ function App() {
   const [viewer, setViewer] = useState(1);
   const [checkoutData, setCheckoutData] = useState({});
   const [cart, setCart] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+
 
   const addToCart = (el) => {
     console.log(el)
@@ -98,55 +100,38 @@ function App() {
     return total
   }
 
-  const ProductRow = ({ title, products, handleProductSelect }) => {
-    if (!Array.isArray(products)) {
-      products = [];
-    }
-    return (
+  const ProductRow = ({ title, products, onProductClick }) => (
+
       <div>
         <h2>{title}</h2>
         <div className="row">
           {products.map((product) => (
-            <div key={product.id} className="col-md-4">
-              <div className="card mb-3">
-                <img
-                  src={product.image} // Product image
-                  alt={product.name} // Alt text
-                  className="card-img-top"
-                  style={{ height: '200px', objectFit: 'cover' }} // Image style
-                />
-                <div className="card-body">
-                  <h3>{product.name}</h3>
-                  <p>{product.description}</p>
-                  <p><strong>Price:</strong> ${product.price}</p>
-                  <button
-                    className="btn btn-info"
-                    onClick={() => handleProductSelect(product)}
-                  >
-                    View Reviews
-                  </button>
-                  <br />
-                  <br />
-                  <button type="button" variant="light" onClick={() => removeFromCart(product)} > - </button>
-                  {"  " + howMany(product) + " "}
-                  <button type="button" variant="light" onClick={() => addToCart(product)}> + </button>
-
+              <div key={product.id} className="col-md-4">
+                <div className="card mb-3" onClick={() => onProductClick(product)}>
+                  <img
+                      src={product.image}
+                      alt={product.name}
+                      className="card-img-top"
+                      style={{ height: '200px', objectFit: 'cover' }}
+                  />
+                  <div className="card-body">
+                    <h3>{product.name}</h3>
+                    <p>{product.description}</p>
+                    <p><strong>Price:</strong> ${product.price}</p>
+                  </div>
                 </div>
               </div>
-              {product.showReviews && <ReviewManager productId={product.id} />}
-            </div>
           ))}
         </div>
       </div>
-    );
-  };
+  );
 
-  function changeView(viewNumber) {
-    const currentNavItem = "navitem-" + viewer;
-    document.getElementById(currentNavItem).classList.remove("active");
+  const changeView = (viewNumber, product = null) => {
     setViewer(viewNumber);
-    document.getElementById("navitem-" + viewNumber).classList.add("active");
-  }
+    if (product) {
+      setSelectedProduct(product);
+    }
+  };
 
   function StudentView() {
     const teacherImageAlpaca =
@@ -325,20 +310,139 @@ function App() {
     );
   };
 
-  const CatView = () => {
-    const [products, setProducts] = useState({ food: [], toy: [], vet: [] });
-
+  const ProductDetailView = ({ product, changeView }) => {
+    const [reviews, setReviews] = useState([]);
 
     useEffect(() => {
-      const fetchProductsByType = async (type) => {
+      // Fetch reviews for the given product
+      const fetchReviews = async () => {
+        if (!product || !product.id) return;
         try {
-          const response = await axios.get(`http://nirajamin.com:8081/listProducts/cat/${type}`);
-          return response.data;
+          const response = await axios.get(`http://nirajamin.com:8081/product/${product.id}/getReviews`);
+          setReviews(response.data);
         } catch (error) {
-          console.error(`Error fetching cat ${type}:`, error);
+          console.error("Error fetching reviews:", error);
         }
       };
 
+      fetchReviews();
+    }, [product]);
+
+    const handleAddReview = async (reviewData) => {
+      try {
+        await axios.post(
+            `http://nirajamin.com:8081/product/${product.id}/addReview`,
+            reviewData
+        );
+        setReviews([...reviews, reviewData]); // Add to the current state
+      } catch (error) {
+        console.error("Error adding review:", error);
+      }
+    };
+
+    const handleUpdateReview = async (reviewName, newText) => {
+      try {
+        await axios.put(
+            `http://nirajamin.com:8081/product/${product.id}/updateReview/${reviewName}`,
+            { text: newText }
+        );
+        const updatedReviews = reviews.map((review) =>
+            review.name === reviewName ? { ...review, text: newText } : review
+        );
+        setReviews(updatedReviews); // Update state with new review text
+      } catch (error) {
+        console.error("Error updating review:", error);
+      }
+    };
+
+    const handleDeleteReview = async (reviewName) => {
+      try {
+        await axios.delete(
+            `http://nirajamin.com:8081/product/${product.id}/deleteReview/${reviewName}`
+        );
+        const remainingReviews = reviews.filter((review) => review.name !== reviewName);
+        setReviews(remainingReviews); // Remove deleted review from state
+      } catch (error) {
+        console.error("Error deleting review:", error);
+      }
+    };
+
+    const ReviewForm = ({ onSubmit }) => {
+      const [reviewName, setReviewName] = useState('');
+      const [reviewText, setReviewText] = useState('');
+      const [reviewRating, setReviewRating] = useState(1);
+
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        onSubmit({
+          name: reviewName,
+          text: reviewText,
+          rating: reviewRating,
+        });
+        // Reset the form
+        setReviewName('');
+        setReviewText('');
+        setReviewRating(1);
+      };
+
+      return (
+          <form onSubmit={handleSubmit}>
+            <input
+                type="text"
+                placeholder="Your name"
+                value={reviewName}
+                onChange={(e) => setReviewName(e.target.value)}
+            />
+            <input
+                type="text"
+                placeholder="Your review"
+                value={reviewText}
+                onChange={(e) => setReviewText(e.target.value)}
+            />
+            <input
+                type="number"
+                placeholder="Rating"
+                value={reviewRating}
+                onChange={(e) => setReviewRating(Number(e.target.value))}
+            />
+            <button type="submit">Add Review</button>
+          </form>
+      );
+    };
+
+    return (
+        <div>
+          <button onClick={() => changeView(2)}>Back to Cat Products</button>
+          <h1>{product.name}</h1>
+          <img src={product.image} alt={product.name} style={{ height: '400px', objectFit: 'cover' }} />
+          <p>{product.description}</p>
+          <p><strong>Price:</strong> ${product.price}</p>
+
+          <h2>Reviews</h2>
+          {reviews.map((review) => (
+              <div key={review.name}>
+                <strong>{review.name}</strong>: {review.text}
+                <button onClick={() => handleUpdateReview(review.name, prompt("Update review text", review.text))}>
+                  Edit Review
+                </button>
+                <button onClick={() => handleDeleteReview(review.name)}>Delete Review</button>
+              </div>
+          ))}
+
+          <ReviewForm onSubmit={handleAddReview} />
+        </div>
+    );
+  };
+
+
+  const CatView = ({ onProductClick }) => {
+    const [products, setProducts] = useState({ food: [], toy: [], vet: [] });
+
+    useEffect(() => {
+      const fetchProductsByType = async (type) => {
+        const response = await axios.get(`http://nirajamin.com:8081/listProducts/cat/${type}`);
+        return response.data;
+      };
 
       const fetchProducts = async () => {
         const food = await fetchProductsByType('food');
@@ -347,83 +451,61 @@ function App() {
         setProducts({ food, toy, vet });
       };
 
-
       fetchProducts();
     }, []);
 
-
-    const handleProductSelect = (product) => {
-      setProducts((prevProducts) => {
-        const newProducts = { ...prevProducts };
-        const category = Object.keys(newProducts).find((cat) =>
-          newProducts[cat].some((p) => p.id === product.id)
-        );
-        newProducts[category] = newProducts[category].map((p) =>
-          p.id === product.id ? { ...p, showReviews: !p.showReviews } : p
-        );
-        return newProducts;
-      });
-    };
-
-
     return (
-      <div>
-        <h1>Cat Products</h1>
-        <ProductRow title="Food" products={products.food} handleProductSelect={handleProductSelect} />
-        <ProductRow title="Toys" products={products.toy} handleProductSelect={handleProductSelect} />
-        <ProductRow title="Vets" products={products.vet} handleProductSelect={handleProductSelect} />
-      </div>
+        <div>
+          <h1>Cat Products</h1>
+          <ProductRow title="Food" products={products.food} onProductClick={onProductClick} />
+          <ProductRow title="Toys" products={products.toy} onProductClick={onProductClick} />
+          <ProductRow title="Vets" products={products.vet} onProductClick={onProductClick} />
+        </div>
     );
   };
 
-  const DogView = () => {
-    const [products, setProducts] = useState({ food: [], toy: [], vet: [] });
-
+  const DogView = ({ onProductClick }) => {
+    // Initialize products with a default structure to avoid undefined errors
+    const [products, setProducts] = useState({
+      food: [],
+      toy: [],
+      vet: []
+    });
 
     useEffect(() => {
       const fetchProductsByType = async (type) => {
         try {
           const response = await axios.get(`http://nirajamin.com:8081/listProducts/dog/${type}`);
-          return response.data;
+          return response.data; // Ensure a valid return value, even if empty
         } catch (error) {
           console.error(`Error fetching dog ${type}:`, error);
+          return []; // Return an empty array to avoid undefined errors
         }
       };
-
 
       const fetchProducts = async () => {
         const food = await fetchProductsByType('food');
         const toy = await fetchProductsByType('toy');
         const vet = await fetchProductsByType('vet');
-        setProducts({ food, toy, vet });
+        setProducts({ food, toy, vet }); // Assign the fetched values
       };
 
-
-      fetchProducts();
-    }, []);
-
-
-    const handleProductSelect = (product) => {
-      setProducts((prevProducts) => {
-        const newProducts = { ...prevProducts };
-        const category = Object.keys(newProducts).find((cat) =>
-          newProducts[cat].some((p) => p.id === product.id)
-        );
-        newProducts[category] = newProducts[category].map((p) =>
-          p.id === product.id ? { ...p, showReviews: !p.showReviews } : p
-        );
-        return newProducts;
-      });
-    };
-
+      fetchProducts(); // Ensure this only runs once (similar to componentDidMount)
+    }, []); // Empty dependency array to avoid re-fetching unnecessarily
 
     return (
-      <div>
-        <h1>Dog Products</h1>
-        <ProductRow title="Food" products={products.food} handleProductSelect={handleProductSelect} />
-        <ProductRow title="Toys" products={products.toy} handleProductSelect={handleProductSelect} />
-        <ProductRow title="Vets" products={products.vet} handleProductSelect={handleProductSelect} />
-      </div>
+        <div>
+          <h1>Dog Products</h1>
+          {Object.values(products).some((arr) => arr.length > 0) ? (
+              <>
+                <ProductRow title="Food" products={products.food} onProductClick={onProductClick} />
+                <ProductRow title="Toys" products={products.toy} onProductClick={onProductClick} />
+                <ProductRow title="Vets" products={products.vet} onProductClick={onProductClick} />
+              </>
+          ) : (
+              <div>Loading products...</div> // Show a loading message until data is fetched
+          )}
+        </div>
     );
   };
 
@@ -574,10 +656,11 @@ function App() {
       {createHeader()}
       <div className="container">
         {viewer === 1 && <StudentView />}
-        {viewer === 2 && <CatView />}
-        {viewer === 3 && <DogView />}
+        {viewer === 2 && <CatView onProductClick={(product) => changeView(6, product)} />}  {/* Correctly passing onProductClick */}
+        {viewer === 3 && <DogView onProductClick={(product) => changeView(6, product)} />}  {/* Same here */}
         {viewer === 4 && <CheckoutView />}
         {viewer === 5 && <ConfirmationView />}
+        {viewer === 6 && <ProductDetailView product={selectedProduct} changeView={changeView} />}
         {createFooter()}
       </div>
     </div>
