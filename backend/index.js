@@ -130,7 +130,7 @@ app.put("/product/:id/updateReview/:name", async (req, res) => {
 
         const updateData = {
             $set: {
-                "productid": Number(req.body.id),
+                "productid": Number(req.params.id),
                 "name": name,
                 "text": req.body.text,
                 "rating": Number(req.body.rating)
